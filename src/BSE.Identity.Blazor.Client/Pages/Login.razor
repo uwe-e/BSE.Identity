@@ -4,28 +4,35 @@
 @using BSE.Identity.Blazor.Client.Models;
 @using BSE.Identity.Blazor.Client.Pages.Shared
 @using Microsoft.AspNetCore.Identity
+@using System.Globalization
 @inject SignInManager<IdentityUser> SignInManager
+@inject IStringLocalizer<Login> Localize
 
 @attribute [AllowAnonymous]
 
-<FluentGrid Spacing="30" Style="display: flex; align-items: center; height: 80vh">
+<FluentGrid Style="display: flex; align-items: center; height: 80vh">
 
     <FluentGridItem xs="12">
         <FluentGrid Justify="@justification">
             <FluentGridItem xs="4">
                 <FluentStack Orientation="Orientation.Vertical">
-                    <h3>Component</h3>
 
+                    <FluentStack VerticalAlignment="@VerticalAlignment.Center">
+                        <img src="/bse-logo-57x57.png" alt="My Logo" /><FluentLabel Typo="@Typography.H2">@Localize["Txt_PageHeader"]</FluentLabel>
+                    </FluentStack>
+                    <FluentLabel Typo="@Typography.H3">@Localize["Txt_FormHeader"]</FluentLabel>
                     <EditForm Model="@input" OnValidSubmit="@FormSubmitted">
 
                         <DataAnnotationsValidator />
                         <FluentValidationSummary />
                         <ErrorMessenger @ref="errorMessenger" />
 
-                        <FluentTextField @bind-Value=@input.Email TextFieldType="TextFieldType.Email" Spellcheck="true" style="width: 100%;">EMail Address</FluentTextField>
-                        <FluentTextField @bind-Value=@input.Password TextFieldType="TextFieldType.Password" style="width: 100%;">Password</FluentTextField>
-
-                        <FluentButton Type="ButtonType.Submit" Appearance="Appearance.Accent" Style="align-content: center">Button</FluentButton>
+                        <FluentTextField @bind-Value=@input.Email TextFieldType="TextFieldType.Email" Spellcheck="true" style="width: 100%;">@Localize["Label_EmailAddress"]</FluentTextField>
+                        <FluentTextField @bind-Value=@input.Password TextFieldType="TextFieldType.Password" style="width: 100%;">@Localize["Label_Password"]</FluentTextField>
+                        <div style="text-align: right">
+                            <FluentButton Type="ButtonType.Submit" Appearance="Appearance.Accent">@Localize["Btn_Submit"]</FluentButton>
+                        </div>
+                        
                     </EditForm>
                 </FluentStack>
             </FluentGridItem>
