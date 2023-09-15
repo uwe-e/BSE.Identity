@@ -1,0 +1,56 @@
+﻿@page "/login"
+@layout ModalLayout
+
+@using BSE.Identity.Blazor.Client.Models;
+@using BSE.Identity.Blazor.Client.Pages.Shared
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+
+@attribute [AllowAnonymous]
+
+<FluentGrid Spacing="30" Style="display: flex; align-items: center; height: 80vh">
+
+    <FluentGridItem xs="12">
+        <FluentGrid Justify="@justification">
+            <FluentGridItem xs="4">
+                <FluentStack Orientation="Orientation.Vertical">
+                    <h3>Component</h3>
+
+                    <EditForm Model="@input" OnValidSubmit="@FormSubmitted">
+
+                        <DataAnnotationsValidator />
+                        <FluentValidationSummary />
+                        <ErrorMessenger @ref="errorMessenger" />
+
+                        <FluentTextField @bind-Value=@input.Email TextFieldType="TextFieldType.Email" Spellcheck="true" style="width: 100%;">EMail Address</FluentTextField>
+                        <FluentTextField @bind-Value=@input.Password TextFieldType="TextFieldType.Password" style="width: 100%;">Password</FluentTextField>
+
+                        <FluentButton Type="ButtonType.Submit" Appearance="Appearance.Accent" Style="align-content: center">Button</FluentButton>
+                    </EditForm>
+                </FluentStack>
+            </FluentGridItem>
+        </FluentGrid>
+    </FluentGridItem>
+
+</FluentGrid>
+
+@code {
+
+    JustifyContent justification = JustifyContent.Center;
+    ErrorMessenger errorMessenger;
+    LoginModel input { get; set; } = new LoginModel();
+
+    async Task FormSubmitted(EditContext editContext)
+    {
+
+        errorMessenger.Errors.Clear();
+
+        var result = await SignInManager.PasswordSignInAsync(input.Email, input.Password, input.RememberMe, lockoutOnFailure: false);
+        if (!result.Succeeded)
+        {
+            errorMessenger.Errors.Add("Invalid login attempt.");
+            errorMessenger.ShowErrors();
+        }
+    }
+
+}

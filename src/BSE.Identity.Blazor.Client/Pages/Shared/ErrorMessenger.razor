@@ -1,0 +1,30 @@
+﻿@inherits ErrorMessengerBase
+
+@if (displayErrors)
+{
+    <div>
+        <ul class="validation-errors">
+            @foreach (string error in base.Errors)
+            {
+                <li class="validation-message">@error</li>
+            }
+        </ul>
+    </div>
+}
+
+@code {
+    
+    public new IList<string> Errors => base.Errors;
+    bool displayErrors { get; set; }
+
+    public void ShowErrors()
+    {
+        displayErrors = base.HasErrors;
+
+        InvokeAsync(() =>
+                {
+
+                    StateHasChanged();
+                });
+    }
+}
