@@ -5,6 +5,7 @@
 @using BSE.Identity.Blazor.Client.Pages.Shared
 @using Microsoft.AspNetCore.Identity
 @using System.Globalization
+@inject NavigationManager Navigation
 @inject SignInManager<IdentityUser> SignInManager
 @inject IStringLocalizer<Login> Localize
 
@@ -32,7 +33,7 @@
                         <div style="text-align: right">
                             <FluentButton Type="ButtonType.Submit" Appearance="Appearance.Accent">@Localize["Btn_Submit"]</FluentButton>
                         </div>
-                        
+
                     </EditForm>
                 </FluentStack>
             </FluentGridItem>
@@ -51,11 +52,25 @@
     {
 
         errorMessenger.Errors.Clear();
-
-        var result = await SignInManager.PasswordSignInAsync(input.Email, input.Password, input.RememberMe, lockoutOnFailure: false);
-        if (!result.Succeeded)
+        try
         {
-            errorMessenger.Errors.Add("Invalid login attempt.");
+
+
+            //var result = await SignInManager.PasswordSignInAsync(input.Email, input.Password, input.RememberMe, lockoutOnFailure: false).ConfigureAwait(true);
+            var result = await SignInManager.PasswordSignInAsync("ueichkorn@arcor.de", "0b75fE6d-", false, lockoutOnFailure: false);
+            if (result.Succeeded)
+            {
+                Navigation.NavigateTo("/");
+            }
+            else
+            {
+                errorMessenger.Errors.Add("Invalid login attempt.");
+                errorMessenger.ShowErrors();
+            }
+        }
+        catch(Exception ex)
+        {
+            errorMessenger.Errors.Add(ex.Message);
             errorMessenger.ShowErrors();
         }
     }
