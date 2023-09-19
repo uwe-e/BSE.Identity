@@ -3,7 +3,7 @@
 @using Microsoft.Extensions.Localization;
 @using Microsoft.Fast.Components.FluentUI
 
-@inject IStringLocalizer<Login> Localize
+@inject IStringLocalizer<LoginModel> Localize
 
 @model LoginModel
 
@@ -13,7 +13,6 @@
     ViewData["Title"] = "Log in";
 }
 
-
 <article class="content">
 
     <div class="container-fluid">
@@ -21,7 +20,7 @@
             <div class="col-3">
                 <div>
                     <div class="hstack">
-                        <img src="/bse-logo-57x57.png" style="mx-auto" alt="My Logo">
+                        <img src="/bse-logo-57x57.png" style="mx-auto;" alt="My Logo">
                         <h2> @Localize["Txt_PageHeader"]</h2>
                     </div>
                     

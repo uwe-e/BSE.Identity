@@ -130,6 +130,6 @@
     <value>Sign in</value>
   </data>
   <data name="Txt_PageHeader" xml:space="preserve">
-    <value>BSE Client Manager</value>
+    <value>Client Manager</value>
   </data>
 </root>
