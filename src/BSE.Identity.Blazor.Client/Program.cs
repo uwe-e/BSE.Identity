@@ -21,6 +21,10 @@ builder.Services.AddSingleton<WeatherForecastService>();
 
 // Configure AddFluentUIComponents() service collection extension
 builder.Services.AddHttpClient();
+//builder.Services.AddHttpClient("formsubmission", c =>
+//{
+//    c.BaseAddress = new Uri(builder.HostEnvironment.b);
+//});
 
 builder.Services.AddFluentUIComponents();
 
@@ -37,6 +41,7 @@ var app = builder.Build();
 //    .AddSupportedUICultures(supportedCultures);
 
 //app.UseRequestLocalization(localizationOptions);
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

@@ -8,7 +8,17 @@ Welcome to your new app.
 
 <SurveyPrompt Title="How is Blazor working for you?" />
 
-<FluentCard>
-  <h2>Hello World!</h2>
-  <FluentButton Appearance="@Appearance.Accent">Click Me</FluentButton>
-</FluentCard>
+<FluentDataGrid id="manualGrid" GenerateHeader=GenerateHeaderOption.None GridTemplateColumns="1fr 1fr" TGridItem="string" role="grid">
+    <FluentDataGridRow RowType="DataGridRowType.Header">
+        <FluentDataGridCell GridColumn=1 CellType="DataGridCellType.ColumnHeader">Column 1</FluentDataGridCell>
+        <FluentDataGridCell GridColumn=2 CellType="DataGridCellType.ColumnHeader">Column 2</FluentDataGridCell>
+    </FluentDataGridRow>
+    <FluentDataGridRow>
+        <FluentDataGridCell GridColumn=1>1.1</FluentDataGridCell>
+        <FluentDataGridCell GridColumn=2>1.2</FluentDataGridCell>
+    </FluentDataGridRow>
+    <FluentDataGridRow>
+        <FluentDataGridCell GridColumn=1>2.1</FluentDataGridCell>
+        <FluentDataGridCell GridColumn=2> 2.2</FluentDataGridCell>
+    </FluentDataGridRow>
+    </FluentDataGrid>
