@@ -22,6 +22,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Update="Resources\Shared.LoginDisplay.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Update="Resources\Shared.MainLayout.resx">
       <SubType>Designer</SubType>
     </EmbeddedResource>

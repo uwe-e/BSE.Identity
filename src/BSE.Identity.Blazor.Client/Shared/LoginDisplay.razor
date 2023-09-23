@@ -1,4 +1,7 @@
-﻿<AuthorizeView>
+﻿@inject IStringLocalizer<LoginDisplay> Localize
+
+
+<AuthorizeView>
     <Authorized>
         <div slot="end">
         <FluentButton id="btnOpen1" Appearance="Appearance.Stealth" slot="end" @onclick="@(() => open = !open)">
@@ -11,7 +14,7 @@
             <FluentMenuItem>
                 <div slot="end">
                 <form method="post" id="frmLogout" action="Identity/Account/Logout">
-                    <FluentButton Type="ButtonType.Submit" Appearance="Appearance.Accent">Log out</FluentButton>
+                            <FluentButton Type="ButtonType.Submit" Appearance="Appearance.Accent">@Localize["Btn_Submit"]</FluentButton>
                     </form>
                 </div> 
             </FluentMenuItem>
