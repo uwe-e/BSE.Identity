@@ -2,7 +2,6 @@ using BSE.Identity.Blazor.Client.Areas.Identity;
 using BSE.Identity.Blazor.Client.Data;
 using BSE.Identity.Blazor.Client.Models;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Fast.Components.FluentUI;
 
@@ -23,10 +22,6 @@ builder.Services.AddSingleton<WeatherForecastService>();
 
 // Configure AddFluentUIComponents() service collection extension
 builder.Services.AddHttpClient();
-//builder.Services.AddHttpClient("formsubmission", c =>
-//{
-//    c.BaseAddress = new Uri(builder.HostEnvironment.b);
-//});
 
 builder.Services.AddFluentUIComponents();
 
