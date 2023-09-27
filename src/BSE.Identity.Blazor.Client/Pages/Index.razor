@@ -1,38 +1,57 @@
 ﻿@page "/"
 @using BSE.Identity.Blazor.Client.Models;
+@using BSE.Identity.Blazor.Client.Threading;
 @using Microsoft.Fast.Components.FluentUI
 @using Microsoft.AspNetCore.Identity
 
 @inject UserManager<ApplicationUser> UserManager
+@inject IStringLocalizer<Index> Localize
 
-<PageTitle>Index</PageTitle>
+<PageTitle>@Localize["Txt_PageTitle"]</PageTitle>
 
-<h1>Hello, world!</h1>
+<FluentLabel Typo="@Typography.H2">@Localize["Txt_PageHeader"]</FluentLabel>
 
-Welcome to your new app.
-
-<SurveyPrompt Title="How is Blazor working for you?" />
-
-<FluentDataGrid id="manualGrid" GenerateHeader=GenerateHeaderOption.None GridTemplateColumns="1fr 1fr" TGridItem="string" role="grid">
-    <FluentDataGridRow RowType="DataGridRowType.Header">
-        <FluentDataGridCell GridColumn=1 CellType="DataGridCellType.ColumnHeader">Column 1</FluentDataGridCell>
-        <FluentDataGridCell GridColumn=2 CellType="DataGridCellType.ColumnHeader">Column 2</FluentDataGridCell>
-    </FluentDataGridRow>
-    <FluentDataGridRow>
-        <FluentDataGridCell GridColumn=1>1.1</FluentDataGridCell>
-        <FluentDataGridCell GridColumn=2>1.2</FluentDataGridCell>
-    </FluentDataGridRow>
-    <FluentDataGridRow>
-        <FluentDataGridCell GridColumn=1>2.1</FluentDataGridCell>
-        <FluentDataGridCell GridColumn=2> 2.2</FluentDataGridCell>
-    </FluentDataGridRow>
+<FluentDataGrid id="manualGrid" Items="@Users" role="grid" TGridItem="UserRolesViewModel">
+    <PropertyColumn Property="@(u => u.UserName)" Title="@Localize["Grid_Column_UserName"]" Sortable="true" />
+    <PropertyColumn Property="@(u => u.FirstName)" Title="@Localize["Grid_Column_FirstName"]" Sortable="true" />
+    <PropertyColumn Property="@(u => u.LastName)" Title="@Localize["Grid_Column_FirstName"]"  Sortable="true" />
+    <PropertyColumn Property="@(u => string.Join(' ' ,u.Roles))" Title="@Localize["Grid_Column_Roles"]" Sortable="true" />
 </FluentDataGrid>
 
 @code {
+    IQueryable<UserRolesViewModel>? Users;
+    SerialQueue serialQueue = new SerialQueue();
+    List<Task<UserRolesViewModel>> createUserRolesViewModelTasks = new List<Task<UserRolesViewModel>>();
 
     protected override Task OnInitializedAsync()
     {
-        var users = UserManager.Users;
+        var users = UserManager.Users.AsEnumerable<ApplicationUser>();
+        foreach (var applicationUser in users)
+        {
+            /*
+             * this is because of that MySQL behaviour
+             * https://mysqlconnector.net/troubleshooting/connection-reuse/
+             */
+            createUserRolesViewModelTasks.Add(serialQueue.Enqueue<UserRolesViewModel>(async () =>
+            {
+                return await GetUserWithRoles(applicationUser);
+            }));
+        }
+
+        Users = createUserRolesViewModelTasks.Select(x => x.Result).AsQueryable();
+
         return base.OnInitializedAsync();
     }
+
+    private async Task<UserRolesViewModel> GetUserWithRoles(ApplicationUser applicationUser)
+    {
+        return new UserRolesViewModel
+            {
+                UserName = applicationUser.UserName,
+                FirstName = applicationUser.FirstName,
+                LastName = applicationUser.LastName,
+                Roles = await UserManager.GetRolesAsync(applicationUser)
+            };
+    }
+
 }
