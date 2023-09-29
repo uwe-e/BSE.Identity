@@ -130,7 +130,7 @@
     <value>Name</value>
   </data>
   <data name="Txt_PageHeader" xml:space="preserve">
-    <value>Users with roles</value>
+    <value>User Accounts</value>
   </data>
   <data name="Txt_PageTitle" xml:space="preserve">
     <value>Users</value>
