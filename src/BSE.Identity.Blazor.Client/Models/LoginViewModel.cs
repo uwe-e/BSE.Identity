@@ -2,7 +2,7 @@
 
 namespace BSE.Identity.Blazor.Client.Models
 {
-    public class LoginModel
+    public class LoginViewModel
     {
         /// <summary>
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used

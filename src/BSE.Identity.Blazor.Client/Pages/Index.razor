@@ -6,10 +6,18 @@
 
 @inject UserManager<ApplicationUser> UserManager
 @inject IStringLocalizer<Index> Localize
+@inject NavigationManager Navigation
 
 <PageTitle>@Localize["Txt_PageTitle"]</PageTitle>
 
 <FluentLabel Typo="@Typography.H2">@Localize["Txt_PageHeader"]</FluentLabel>
+
+<FluentToolbar Style="width: 100%">
+    <FluentButton slot="end" Appearance="Appearance.Accent" OnClick="@OnRegisterUser">
+        <FluentIcon Slot="start"  Value="@(new Icons.Regular.Size16.PeopleAdd())" Color="Color.Fill" />
+        New User
+    </FluentButton>
+</FluentToolbar>
 
 <FluentDataGrid id="manualGrid" Items="@Users" role="grid" TGridItem="UserRolesViewModel">
     <PropertyColumn Property="@(u => u.UserName)" Title="@Localize["Grid_Column_UserName"]" Sortable="true" />
@@ -29,9 +37,9 @@
         foreach (var applicationUser in users)
         {
             /*
-             * this is because of that MySQL behaviour
-             * https://mysqlconnector.net/troubleshooting/connection-reuse/
-             */
+            * this is because of that MySQL behaviour
+            * https://mysqlconnector.net/troubleshooting/connection-reuse/
+            */
             createUserRolesViewModelTasks.Add(serialQueue.Enqueue<UserRolesViewModel>(async () =>
             {
                 return await GetUserWithRoles(applicationUser);
@@ -54,4 +62,8 @@
             };
     }
 
+    async Task OnRegisterUser()
+    {
+        Navigation.NavigateTo("/Register");
+    }
 }

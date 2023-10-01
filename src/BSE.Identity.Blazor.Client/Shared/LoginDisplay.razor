@@ -4,30 +4,35 @@
 <AuthorizeView>
     <Authorized>
         <div slot="end">
-        <FluentButton id="btnOpen1" Appearance="Appearance.Stealth" slot="end" @onclick="@(() => open = !open)">
-            @context.User.Identity?.Name
-                <svg slot="end" style="width: 24px; fill: var(--neutral-foreground-rest);" focusable="false" viewBox="0 0 24 24" aria-hidden="true"><!--!--><path d="M4.22 8.47c.3-.3.77-.3 1.06 0L12 15.19l6.72-6.72a.75.75 0 1 1 1.06 1.06l-7.25 7.25c-.3.3-.77.3-1.06 0L4.22 9.53a.75.75 0 0 1 0-1.06Z"></path></svg>
-        </FluentButton>
-        
-        <FluentMenu Anchor="btnOpen1" @bind-Open="open">
-            
-            <FluentMenuItem>
-                <div slot="end">
-                <form method="post" id="frmLogout" action="Identity/Account/Logout">
+            <FluentButton id="btnOpen1" Appearance="Appearance.Stealth" slot="end" @onclick="@(() => open = !open)">
+                @context.User.Identity?.Name
+                <FluentIcon Slot="end" Value="@(open ? ChevronUp : ChevronDown)" Color="Color.Neutral" />
+            </FluentButton>
+
+            <FluentMenu Anchor="btnOpen1" @bind-Open="open">
+
+                <FluentMenuItem>
+                    <div slot="end">
+                        <form method="post" id="frmLogout" action="Identity/Account/Logout">
                             <FluentButton Type="ButtonType.Submit" Appearance="Appearance.Accent">@Localize["Btn_Submit"]</FluentButton>
-                    </form>
-                </div> 
-            </FluentMenuItem>
+                        </form>
+                    </div>
+                </FluentMenuItem>
 
             </FluentMenu>
         </div>
     </Authorized>
-@*     <NotAuthorized>
-        <a href="Identity/Account/Register">Register</a>
-        <a href="Identity/Account/Login">Log in</a>
+    @*     <NotAuthorized>
+    <a href="Identity/Account/Register">Register</a>
+    <a href="Identity/Account/Login">Log in</a>
     </NotAuthorized> *@
 </AuthorizeView>
 
 @code {
     bool open = false;
+    Icon chevronUp;
+    Icon chevronDown;
+
+    Icon ChevronDown => chevronDown ?? (chevronDown = new Icons.Regular.Size16.ChevronDown());
+    Icon ChevronUp => chevronUp ?? (chevronUp = new Icons.Regular.Size16.ChevronUp());
 }

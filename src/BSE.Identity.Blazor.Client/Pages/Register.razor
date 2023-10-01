@@ -1,0 +1,89 @@
+﻿@page "/register"
+
+@using BSE.Identity.Blazor.Client.Models;
+@using BSE.Identity.Blazor.Client.Pages.Shared
+@using System.Globalization
+@using Microsoft.AspNetCore.Identity;
+
+@inject NavigationManager Navigation
+@inject UserManager<ApplicationUser> UserManager
+@inject IStringLocalizer<Register> Localize
+
+<FluentGrid Style="display: flex; align-items: center; height: 80vh">
+    <FluentGridItem xs="12">
+        <FluentGrid Justify="@justification">
+            <FluentGridItem xs="4">
+                <FluentStack Orientation="Orientation.Vertical">
+                    
+                    <EditForm Model="@input" OnValidSubmit="@HandleValidSubmit">
+
+                        <DataAnnotationsValidator />
+                        <FluentValidationSummary />
+                        <ErrorMessenger @ref="errorMessenger" />
+
+                        <FluentTextField @bind-Value=@input.Email TextFieldType="TextFieldType.Email" Spellcheck="true" style="width: 100%;">@Localize["Label_EmailAddress"]</FluentTextField>
+                        
+                        <FluentTextField @bind-Value=@input.FirstName TextFieldType="TextFieldType.Text" style="width: 100%;">@Localize["Label_FirstName"]</FluentTextField>
+
+                        <FluentTextField @bind-Value=@input.LastName TextFieldType="TextFieldType.Text" style="width: 100%;">@Localize["Label_LastName"]</FluentTextField>
+
+                        <FluentTextField @bind-Value=@input.Password TextFieldType="TextFieldType.Password" style="width: 100%;">@Localize["Label_Password"]</FluentTextField>
+
+                        <FluentTextField @bind-Value=@input.ConfirmPassword TextFieldType="TextFieldType.Password" style="width: 100%;">@Localize["Label_Confirm_Password"]</FluentTextField>
+                        
+                        <div style="text-align: right">
+                            <FluentButton Type="ButtonType.Submit" Appearance="Appearance.Accent">@Localize["Btn_Submit"]</FluentButton>
+                        </div>
+
+                    </EditForm>
+                </FluentStack>
+            </FluentGridItem>
+        </FluentGrid>
+    </FluentGridItem>
+
+</FluentGrid>
+
+
+@code {
+    JustifyContent justification = JustifyContent.FlexStart;
+    ErrorMessenger errorMessenger;
+    RegisterViewModel input { get; set; } = new RegisterViewModel();
+
+    async Task HandleValidSubmit(EditContext editContext)
+    {
+        errorMessenger.Errors.Clear();
+
+        try
+        {
+            ApplicationUser newUser = new ApplicationUser
+                {
+                    UserName = input.Email,
+                    Email = input.Email,
+                    FirstName = input.FirstName ?? string.Empty,
+                    LastName = input.LastName ?? string.Empty
+
+                };
+            var identityResult = await UserManager.CreateAsync(newUser, input.Password);
+            if (identityResult.Succeeded)
+            {
+                Navigation.NavigateTo("/");
+            }
+            else
+            {
+                foreach (var identityError in identityResult.Errors)
+                {
+                    errorMessenger.Errors.Add(identityError.Description);
+                }
+                
+                errorMessenger.ShowErrors();
+
+            }
+        }
+        catch(Exception exception)
+        {
+            errorMessenger.Errors.Add(exception.Message);
+            errorMessenger.ShowErrors();
+        }
+
+    }
+}
