@@ -1,16 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using BSE.Identity.Blazor.Client.ViewModels;
+using System.ComponentModel.DataAnnotations;
 
 namespace BSE.Identity.Blazor.Client.Models
 {
     public class RegisterViewModel : LoginViewModel
     {
-        //[Required]
-        //public string? UserName
-        //{
-        //    get;
-        //    set;
-        //}
-
         public string? FirstName
         {
             get;

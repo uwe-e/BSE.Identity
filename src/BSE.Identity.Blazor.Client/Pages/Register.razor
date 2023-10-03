@@ -3,13 +3,18 @@
 @using BSE.Identity.Blazor.Client.Models;
 @using BSE.Identity.Blazor.Client.Pages.Shared
 @using System.Globalization
+@using BSE.Identity.Blazor.Client.ViewModels;
 @using Microsoft.AspNetCore.Identity;
 
 @inject NavigationManager Navigation
 @inject UserManager<ApplicationUser> UserManager
 @inject IStringLocalizer<Register> Localize
 
-<FluentGrid Style="display: flex; align-items: center; height: 80vh">
+<FluentLabel Typo="@Typography.H2">@Localize["Txt_PageHeader"]</FluentLabel>
+
+<FluentLabel Typo="@Typography.Subject" Style="margin: 30px 0px">Add a new User Account</FluentLabel>
+
+<FluentGrid Style="display: flex; align-items: flex-start; height: 80vh;">
     <FluentGridItem xs="12">
         <FluentGrid Justify="@justification">
             <FluentGridItem xs="4">

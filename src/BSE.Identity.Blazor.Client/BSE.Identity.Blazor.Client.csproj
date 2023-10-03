@@ -19,11 +19,19 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Fast.Components.FluentUI" Version="3.1.0" />
+    <PackageReference Include="Microsoft.Fast.Components.FluentUI" Version="3.1.1" />
     <PackageReference Include="Microsoft.Fast.Components.FluentUI.DataGrid.EntityFrameworkAdapter" Version="3.0.0" />
     <PackageReference Include="Microsoft.Fast.Components.FluentUI.Icons" Version="3.1.1" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="7.0.10" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="7.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Resources\ViewModels.RegisterViewModel.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ViewModels.RegisterViewModel.resx</DependentUpon>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>
@@ -35,6 +43,10 @@
     </EmbeddedResource>
     <EmbeddedResource Update="Resources\Areas.Identity.Pages.Account.LoginModel.resx">
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\ViewModels.RegisterViewModel.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>ViewModels.RegisterViewModel.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
 

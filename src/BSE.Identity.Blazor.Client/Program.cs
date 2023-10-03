@@ -29,7 +29,6 @@ builder.Services.AddFluentUIComponents();
 
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 
-
 var app = builder.Build();
 
 //var supportedCultures = new[] { "en-US", "de-de" };

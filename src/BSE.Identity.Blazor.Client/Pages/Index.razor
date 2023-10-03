@@ -24,6 +24,11 @@
     <PropertyColumn Property="@(u => u.FirstName)" Title="@Localize["Grid_Column_FirstName"]" Sortable="true" />
     <PropertyColumn Property="@(u => u.LastName)" Title="@Localize["Grid_Column_FirstName"]"  Sortable="true" />
     <PropertyColumn Property="@(u => string.Join(' ' ,u.Roles))" Title="@Localize["Grid_Column_Roles"]" Sortable="true" />
+    <TemplateColumn Title="Actions" Align="@Align.End">
+        <FluentButton Appearance="Appearance.Accent">
+            <FluentIcon Value="@(new Icons.Regular.Size16.Delete())" Style="fill: var(--foreground-on-accent-rest)" />
+        </FluentButton>
+    </TemplateColumn>
 </FluentDataGrid>
 
 @code {

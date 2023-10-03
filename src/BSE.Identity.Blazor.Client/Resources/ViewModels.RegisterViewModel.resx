@@ -127,7 +127,7 @@
     <value>Email address</value>
   </data>
   <data name="Label_FirstName" xml:space="preserve">
-    <value>First Name</value>
+    <value>First Name123</value>
   </data>
   <data name="Label_LastName" xml:space="preserve">
     <value>Last Name</value>
@@ -137,6 +137,12 @@
   </data>
   <data name="Label_UserName" xml:space="preserve">
     <value>User Name</value>
+  </data>
+  <data name="RequiredError" xml:space="preserve">
+    <value>asdadadada</value>
+  </data>
+  <data name="The password and confirmation password do not match." xml:space="preserve">
+    <value>gjsdjasgjdgajdgas</value>
   </data>
   <data name="Txt_PageHeader" xml:space="preserve">
     <value>New User</value>
