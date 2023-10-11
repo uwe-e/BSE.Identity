@@ -117,6 +117,18 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Dlg_Result_No" xml:space="preserve">
+    <value>No</value>
+  </data>
+  <data name="Dlg_Result_Yes" xml:space="preserve">
+    <value>Yes</value>
+  </data>
+  <data name="Dlg_UserDeletion_Message" xml:space="preserve">
+    <value>Do you want to delete the user '{0}'</value>
+  </data>
+  <data name="Dlg_UserDeletion_Title" xml:space="preserve">
+    <value>User Account Deletion</value>
+  </data>
   <data name="Grid_Column_FirstName" xml:space="preserve">
     <value>First name</value>
   </data>

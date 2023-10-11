@@ -1,4 +1,5 @@
 ﻿@page "/"
+@using BSE.Identity.Blazor.Client.Data;
 @using BSE.Identity.Blazor.Client.Models;
 @using BSE.Identity.Blazor.Client.Threading;
 @using Microsoft.Fast.Components.FluentUI
@@ -6,7 +7,11 @@
 
 @inject UserManager<ApplicationUser> UserManager
 @inject IStringLocalizer<Index> Localize
+@inject IDialogService DialogService
 @inject NavigationManager Navigation
+@inject ApplicationDbContext _context;
+
+<FluentDialogProvider />
 
 <PageTitle>@Localize["Txt_PageTitle"]</PageTitle>
 
@@ -14,18 +19,18 @@
 
 <FluentToolbar Style="width: 100%">
     <FluentButton slot="end" Appearance="Appearance.Accent" OnClick="@OnRegisterUser">
-        <FluentIcon Slot="start"  Value="@(new Icons.Regular.Size16.PeopleAdd())" Color="Color.Fill" />
+        <FluentIcon Slot="start" Value="@(new Icons.Regular.Size16.PeopleAdd())" Color="Color.Fill" />
         New User
     </FluentButton>
 </FluentToolbar>
 
-<FluentDataGrid id="manualGrid" Items="@Users" role="grid" TGridItem="UserRolesViewModel">
+<FluentDataGrid id="manualGrid" Items="@Users" Virtualize="true" ItemSize="40" role="grid" TGridItem="UserRolesViewModel">
     <PropertyColumn Property="@(u => u.UserName)" Title="@Localize["Grid_Column_UserName"]" Sortable="true" />
     <PropertyColumn Property="@(u => u.FirstName)" Title="@Localize["Grid_Column_FirstName"]" Sortable="true" />
-    <PropertyColumn Property="@(u => u.LastName)" Title="@Localize["Grid_Column_FirstName"]"  Sortable="true" />
+    <PropertyColumn Property="@(u => u.LastName)" Title="@Localize["Grid_Column_FirstName"]" Sortable="true" />
     <PropertyColumn Property="@(u => string.Join(' ' ,u.Roles))" Title="@Localize["Grid_Column_Roles"]" Sortable="true" />
     <TemplateColumn Title="Actions" Align="@Align.End">
-        <FluentButton Appearance="Appearance.Accent">
+        <FluentButton Appearance="Appearance.Accent" OnClick="@(() => OnDeleteUser(context))">
             <FluentIcon Value="@(new Icons.Regular.Size16.Delete())" Style="fill: var(--foreground-on-accent-rest)" />
         </FluentButton>
     </TemplateColumn>
@@ -36,7 +41,86 @@
     SerialQueue serialQueue = new SerialQueue();
     List<Task<UserRolesViewModel>> createUserRolesViewModelTasks = new List<Task<UserRolesViewModel>>();
 
-    protected override Task OnInitializedAsync()
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        var users = UserManager.Users.AsEnumerable<ApplicationUser>();
+        // List<UserRolesViewModel> usersWithRoles = new List<UserRolesViewModel>();
+        // foreach (var applicationUser in users)
+        // {
+        //     /*
+        //     * this is because of that MySQL behaviour
+        //     * https://mysqlconnector.net/troubleshooting/connection-reuse/
+        //     */
+        //     // createUserRolesViewModelTasks.Add(serialQueue.Enqueue<UserRolesViewModel>(async () =>
+        //     // {
+        //     //     return await GetUserWithRoles(applicationUser);
+        //     // }));
+        //     // UserRolesViewModel userWithRole = new UserRolesViewModel
+        //     //     {
+        //     //         UserId = applicationUser.Id,
+        //     //         UserName = applicationUser.UserName,
+        //     //         FirstName = applicationUser.FirstName,
+        //     //         LastName = applicationUser.LastName,
+        //     //         Roles = await UserManager.GetRolesAsync(applicationUser)
+        //     //     };
+
+        //     //     usersWithRoles.Add(userWithRole);
+        //     var result = GetUserWithRoles(applicationUser).Result;
+
+
+        // }
+        // Users = usersWithRoles.AsQueryable<UserRolesViewModel>();
+        //Users = createUserRolesViewModelTasks.Select(x => x.Result).AsQueryable();
+        Users = GetApplicationUsers();
+
+        //return base.OnInitializedAsync();
+    }
+
+
+
+    async Task OnRegisterUser()
+    {
+        Navigation.NavigateTo("/Register");
+    }
+
+    async Task OnDeleteUser(UserRolesViewModel model)
+    {
+        try
+        {
+            string dialogResultYes = Localize.GetString("Dlg_Result_Yes");
+            string dialogResultNo = Localize.GetString("Dlg_Result_No");
+            string dialogTitle = Localize.GetString("Dlg_UserDeletion_Title");
+            string dialogMessage = Localize.GetString("Dlg_UserDeletion_Message", model.UserName);
+
+            var dialog = await DialogService.ShowConfirmationAsync(dialogMessage, dialogResultYes, dialogResultNo, dialogTitle);
+            var result = await dialog.Result;
+            if (!result.Cancelled)
+            {
+                var userToDelete = _context.Users.First<ApplicationUser>(u => u.Id == model.UserId);
+                if (userToDelete != null)
+                {
+                    var userId = userToDelete.Id;
+                    var deletionResult = await UserManager.DeleteAsync(userToDelete);
+                    if (deletionResult.Succeeded)
+                    {
+                        var userWithRole = GetUserWithRoles(userToDelete);
+                    }
+
+                }
+
+            }
+
+        }
+        catch (Exception ex)
+        {
+
+        }
+
+    }
+
+    private IQueryable<UserRolesViewModel> GetApplicationUsers()
     {
         var users = UserManager.Users.AsEnumerable<ApplicationUser>();
         foreach (var applicationUser in users)
@@ -51,15 +135,14 @@
             }));
         }
 
-        Users = createUserRolesViewModelTasks.Select(x => x.Result).AsQueryable();
-
-        return base.OnInitializedAsync();
-    }
+        return createUserRolesViewModelTasks.Select(x => x.Result).AsQueryable();
+    } 
 
     private async Task<UserRolesViewModel> GetUserWithRoles(ApplicationUser applicationUser)
     {
         return new UserRolesViewModel
             {
+                UserId = applicationUser.Id,
                 UserName = applicationUser.UserName,
                 FirstName = applicationUser.FirstName,
                 LastName = applicationUser.LastName,
@@ -67,8 +150,8 @@
             };
     }
 
-    async Task OnRegisterUser()
+    private async Task<IList<string>> GetRolesAsync(ApplicationUser applicationUser)
     {
-        Navigation.NavigateTo("/Register");
+        return await UserManager.GetRolesAsync(applicationUser);
     }
 }
