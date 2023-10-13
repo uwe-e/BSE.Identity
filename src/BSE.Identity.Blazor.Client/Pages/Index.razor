@@ -30,6 +30,9 @@
     <PropertyColumn Property="@(u => u.LastName)" Title="@Localize["Grid_Column_FirstName"]" Sortable="true" />
     <PropertyColumn Property="@(u => string.Join(' ' ,u.Roles))" Title="@Localize["Grid_Column_Roles"]" Sortable="true" />
     <TemplateColumn Title="Actions" Align="@Align.End">
+        <FluentButton Appearance="Appearance.Accent" OnClick="@(() => OnEditUser(context))">
+            <FluentIcon Value="@(new Icons.Regular.Size16.Edit())" Style="fill: var(--foreground-on-accent-rest)" />
+        </FluentButton>
         <FluentButton Appearance="Appearance.Accent" OnClick="@(() => OnDeleteUser(context))">
             <FluentIcon Value="@(new Icons.Regular.Size16.Delete())" Style="fill: var(--foreground-on-accent-rest)" />
         </FluentButton>
@@ -38,120 +41,110 @@
 
 @code {
     IQueryable<UserRolesViewModel>? Users;
-    SerialQueue serialQueue = new SerialQueue();
-    List<Task<UserRolesViewModel>> createUserRolesViewModelTasks = new List<Task<UserRolesViewModel>>();
+    // SerialQueue serialQueue = new SerialQueue();
+    // List<Task<UserRolesViewModel>> createUserRolesViewModelTasks = new List<Task<UserRolesViewModel>>();
 
-
-
-    protected override async Task OnInitializedAsync()
+    protected override Task OnInitializedAsync()
     {
-        var users = UserManager.Users.AsEnumerable<ApplicationUser>();
-        // List<UserRolesViewModel> usersWithRoles = new List<UserRolesViewModel>();
-        // foreach (var applicationUser in users)
-        // {
-        //     /*
-        //     * this is because of that MySQL behaviour
-        //     * https://mysqlconnector.net/troubleshooting/connection-reuse/
-        //     */
-        //     // createUserRolesViewModelTasks.Add(serialQueue.Enqueue<UserRolesViewModel>(async () =>
-        //     // {
-        //     //     return await GetUserWithRoles(applicationUser);
-        //     // }));
-        //     // UserRolesViewModel userWithRole = new UserRolesViewModel
-        //     //     {
-        //     //         UserId = applicationUser.Id,
-        //     //         UserName = applicationUser.UserName,
-        //     //         FirstName = applicationUser.FirstName,
-        //     //         LastName = applicationUser.LastName,
-        //     //         Roles = await UserManager.GetRolesAsync(applicationUser)
-        //     //     };
-
-        //     //     usersWithRoles.Add(userWithRole);
-        //     var result = GetUserWithRoles(applicationUser).Result;
-
-
-        // }
-        // Users = usersWithRoles.AsQueryable<UserRolesViewModel>();
-        //Users = createUserRolesViewModelTasks.Select(x => x.Result).AsQueryable();
         Users = GetApplicationUsers();
-
-        //return base.OnInitializedAsync();
+        return base.OnInitializedAsync();
     }
 
 
-
-    async Task OnRegisterUser()
+    void OnRegisterUser()
     {
         Navigation.NavigateTo("/Register");
     }
 
+    void OnEditUser(UserRolesViewModel model)
+    {
+        Navigation.NavigateTo($"/edit/{model.UserId}");
+    }
+
     async Task OnDeleteUser(UserRolesViewModel model)
     {
-        try
-        {
-            string dialogResultYes = Localize.GetString("Dlg_Result_Yes");
-            string dialogResultNo = Localize.GetString("Dlg_Result_No");
-            string dialogTitle = Localize.GetString("Dlg_UserDeletion_Title");
-            string dialogMessage = Localize.GetString("Dlg_UserDeletion_Message", model.UserName);
+        string dialogResultYes = Localize.GetString("Dlg_Result_Yes");
+        string dialogResultNo = Localize.GetString("Dlg_Result_No");
+        string dialogTitle = Localize.GetString("Dlg_UserDeletion_Title");
+        string dialogMessage = Localize.GetString("Dlg_UserDeletion_Message", model.UserName);
 
-            var dialog = await DialogService.ShowConfirmationAsync(dialogMessage, dialogResultYes, dialogResultNo, dialogTitle);
-            var result = await dialog.Result;
-            if (!result.Cancelled)
+        var dialog = await DialogService.ShowConfirmationAsync(dialogMessage, dialogResultYes, dialogResultNo, dialogTitle);
+        var result = await dialog.Result;
+        if (!result.Cancelled)
+        {
+            var userToDelete = _context.Users.First<ApplicationUser>(u => u.Id == model.UserId);
+            if (userToDelete != null)
             {
-                var userToDelete = _context.Users.First<ApplicationUser>(u => u.Id == model.UserId);
-                if (userToDelete != null)
+                var userId = userToDelete.Id;
+                var deletionResult = await UserManager.DeleteAsync(userToDelete);
+                if (deletionResult.Succeeded)
                 {
-                    var userId = userToDelete.Id;
-                    var deletionResult = await UserManager.DeleteAsync(userToDelete);
-                    if (deletionResult.Succeeded)
-                    {
-                        var userWithRole = GetUserWithRoles(userToDelete);
-                    }
-
+                    Users = GetApplicationUsers();
                 }
-
             }
-
         }
-        catch (Exception ex)
-        {
-
-        }
-
     }
 
     private IQueryable<UserRolesViewModel> GetApplicationUsers()
     {
-        var users = UserManager.Users.AsEnumerable<ApplicationUser>();
-        foreach (var applicationUser in users)
-        {
-            /*
-            * this is because of that MySQL behaviour
-            * https://mysqlconnector.net/troubleshooting/connection-reuse/
-            */
-            createUserRolesViewModelTasks.Add(serialQueue.Enqueue<UserRolesViewModel>(async () =>
-            {
-                return await GetUserWithRoles(applicationUser);
-            }));
-        }
+        /*
+         * this is because of that MySQL behaviour
+         * https://mysqlconnector.net/troubleshooting/connection-reuse/
+         *
+         * the original query should be the use of UserManager.GetRolesAsync(user)
+        */
+        var users = UserManager.Users;
+        var usersWithRoles = (from user in users
+                              join userrole in _context.UserRoles
+                              on user.Id equals userrole.UserId into userRolesGroup
+                              from ur in userRolesGroup.DefaultIfEmpty()
+                              join role in _context.Roles
+                              on ur.RoleId equals role.Id into rolesGrpup
+                              from r in rolesGrpup.DefaultIfEmpty()
+                              select new UserRolesViewModel
+                                  {
+                                      UserId = user.Id,
+                                      UserName = user.UserName,
+                                      FirstName = user.FirstName,
+                                      LastName = user.LastName,
+                                      Roles = new List<string> { r.Name }
+                                  }).ToList();
 
-        return createUserRolesViewModelTasks.Select(x => x.Result).AsQueryable();
-    } 
-
-    private async Task<UserRolesViewModel> GetUserWithRoles(ApplicationUser applicationUser)
-    {
-        return new UserRolesViewModel
-            {
-                UserId = applicationUser.Id,
-                UserName = applicationUser.UserName,
-                FirstName = applicationUser.FirstName,
-                LastName = applicationUser.LastName,
-                Roles = await UserManager.GetRolesAsync(applicationUser)
-            };
+        return usersWithRoles.AsQueryable();
     }
 
-    private async Task<IList<string>> GetRolesAsync(ApplicationUser applicationUser)
-    {
-        return await UserManager.GetRolesAsync(applicationUser);
-    }
+    // private IQueryable<UserRolesViewModel> GetApplicationUsers()
+    // {
+    //     var users = UserManager.Users.AsEnumerable<ApplicationUser>();
+    //     foreach (var applicationUser in users)
+    //     {
+    //         /*
+    //         * this is because of that MySQL behaviour
+    //         * https://mysqlconnector.net/troubleshooting/connection-reuse/
+    //         */
+    //         createUserRolesViewModelTasks.Add(serialQueue.Enqueue<UserRolesViewModel>(async () =>
+    //         {
+    //             return await GetUserWithRoles(applicationUser);
+    //         }));
+    //     }
+
+    //     return createUserRolesViewModelTasks.Select(x => x.Result).AsQueryable();
+    // }
+
+    // private async Task<UserRolesViewModel> GetUserWithRoles(ApplicationUser applicationUser)
+    // {
+    //     return new UserRolesViewModel
+    //         {
+    //             UserId = applicationUser.Id,
+    //             UserName = applicationUser.UserName,
+    //             FirstName = applicationUser.FirstName,
+    //             LastName = applicationUser.LastName,
+    //             Roles = await UserManager.GetRolesAsync(applicationUser)
+    //         };
+    // }
+
+    // private async Task<IList<string>> GetRolesAsync(ApplicationUser applicationUser)
+    // {
+    //     return await UserManager.GetRolesAsync(applicationUser);
+    // }
 }
