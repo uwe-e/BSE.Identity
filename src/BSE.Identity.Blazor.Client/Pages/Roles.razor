@@ -1,0 +1,19 @@
+﻿@page "/roles"
+
+@using BSE.Identity.Blazor.Client.Pages.Shared
+
+@inject IStringLocalizer<Register> Localize
+
+<FluentDialogProvider />
+
+<PageTitle>@Localize["Txt_PageTitle"]</PageTitle>
+
+
+<NavigationBar/>
+
+@code {
+    protected override Task OnInitializedAsync()
+    {
+        return base.OnInitializedAsync();
+    }
+}

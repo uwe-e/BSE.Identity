@@ -1,6 +1,7 @@
 ﻿@page "/"
 @using BSE.Identity.Blazor.Client.Data;
 @using BSE.Identity.Blazor.Client.Models;
+@using BSE.Identity.Blazor.Client.Pages.Shared
 @using BSE.Identity.Blazor.Client.Threading;
 @using Microsoft.Fast.Components.FluentUI
 @using Microsoft.AspNetCore.Identity
@@ -14,6 +15,18 @@
 <FluentDialogProvider />
 
 <PageTitle>@Localize["Txt_PageTitle"]</PageTitle>
+
+@* <FluentToolbar Style="width: 100%">
+    <FluentButton slot="start" Appearance="Appearance.Outline" OnClick="@OnRegisterUser" Disabled>
+        <FluentIcon Slot="start" Value="@(new Icons.Regular.Size16.PeopleList())" Color="Color.Accent" />
+        User Management
+    </FluentButton>
+    <FluentButton Appearance="Appearance.Stealth" OnClick="@OnRegisterUser">
+        <FluentIcon Slot="start" Value="@(new Icons.Regular.Size16.FolderPerson())" Color="Color.Accent" />
+        Role Management
+    </FluentButton>
+</FluentToolbar> *@
+<NavigationBar/>
 
 <FluentLabel Typo="@Typography.H2">@Localize["Txt_PageHeader"]</FluentLabel>
 

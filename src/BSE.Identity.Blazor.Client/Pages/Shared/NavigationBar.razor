@@ -1,0 +1,43 @@
+﻿@inject NavigationManager Navigation
+
+
+<FluentToolbar Style="width: 100%">
+    <FluentButton slot="start" OnClick="@OnNavigateToUserManagement" Disabled="_disabled == EnabledNavigation.None">
+        <FluentIcon Slot="start" Value="@(new Icons.Regular.Size16.PeopleList())" Color="Color.Accent" />
+        User Management
+    </FluentButton>
+    <FluentButton OnClick="@OnNavigateToRoleManagement" Disabled="_disabled == EnabledNavigation.Roles">
+        <FluentIcon Slot="start" Value="@(new Icons.Regular.Size16.FolderPerson())" Color="Color.Accent" />
+        Role Management
+    </FluentButton>
+</FluentToolbar>
+
+@code {
+    EnabledNavigation _disabled;
+
+    void OnNavigateToUserManagement()
+    {
+        Navigation.NavigateTo("/");
+    }
+
+    void OnNavigateToRoleManagement()
+    {
+        Navigation.NavigateTo("/roles");
+    }
+
+    protected override Task OnInitializedAsync()
+    {
+        var route = Navigation.ToBaseRelativePath(Navigation.Uri);
+        Enum.TryParse<EnabledNavigation>(route?.ToUpperFirstChar(), out _disabled);
+
+        return base.OnInitializedAsync();
+    }
+
+    enum EnabledNavigation
+    {
+        None,
+        Roles
+    }
+}
+
+
