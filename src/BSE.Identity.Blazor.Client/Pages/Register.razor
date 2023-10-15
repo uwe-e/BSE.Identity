@@ -1,4 +1,4 @@
-﻿@page "/register"
+﻿@implements IDialogContentComponent<RegisterViewModel>
 
 @using BSE.Identity.Blazor.Client.Models;
 @using BSE.Identity.Blazor.Client.Pages.Shared
@@ -6,89 +6,94 @@
 @using BSE.Identity.Blazor.Client.ViewModels;
 @using Microsoft.AspNetCore.Identity;
 
-@inject NavigationManager Navigation
 @inject UserManager<ApplicationUser> UserManager
 @inject IStringLocalizer<Register> Localize
 
-<FluentLabel Typo="@Typography.H2">@Localize["Txt_PageHeader"]</FluentLabel>
+<EditForm Model="@Content" OnValidSubmit="@HandleValidSubmit">
+    <FluentDialogHeader ShowDismiss="true">
+        <FluentStack VerticalAlignment="VerticalAlignment.Center">
+            <FluentIcon Value="@(new Icons.Regular.Size24.PeopleAdd())" />
+            <FluentLabel Typo="Typography.PaneHeader">
+                @Localize["Txt_PageHeader"]
+            </FluentLabel>
+        </FluentStack>
 
-<FluentLabel Typo="@Typography.Subject" Style="margin: 30px 0px">Add a new User Account</FluentLabel>
+    </FluentDialogHeader>
 
-<FluentGrid Style="display: flex; align-items: flex-start; height: 80vh;">
-    <FluentGridItem xs="12">
-        <FluentGrid Justify="@justification">
-            <FluentGridItem xs="4">
-                <FluentStack Orientation="Orientation.Vertical">
-                    
-                    <EditForm Model="@input" OnValidSubmit="@HandleValidSubmit">
+    <FluentDialogBody>
+        <FluentStack Orientation="Orientation.Vertical">
 
-                        <DataAnnotationsValidator />
-                        <FluentValidationSummary />
-                        <ErrorMessenger @ref="errorMessenger" />
+            <DataAnnotationsValidator />
+            <FluentValidationSummary />
+            <ErrorMessenger @ref="ErrorMessenger" />
 
-                        <FluentTextField @bind-Value=@input.Email TextFieldType="TextFieldType.Email" Spellcheck="true" style="width: 100%;">@Localize["Label_EmailAddress"]</FluentTextField>
-                        
-                        <FluentTextField @bind-Value=@input.FirstName TextFieldType="TextFieldType.Text" style="width: 100%;">@Localize["Label_FirstName"]</FluentTextField>
+            <FluentTextField @bind-Value=@Content.Email TextFieldType="TextFieldType.Email" Spellcheck="true" style="width: 100%;">@Localize["Label_EmailAddress"]</FluentTextField>
 
-                        <FluentTextField @bind-Value=@input.LastName TextFieldType="TextFieldType.Text" style="width: 100%;">@Localize["Label_LastName"]</FluentTextField>
+            <FluentTextField @bind-Value=@Content.FirstName TextFieldType="TextFieldType.Text" style="width: 100%;">@Localize["Label_FirstName"]</FluentTextField>
 
-                        <FluentTextField @bind-Value=@input.Password TextFieldType="TextFieldType.Password" style="width: 100%;">@Localize["Label_Password"]</FluentTextField>
+            <FluentTextField @bind-Value=@Content.LastName TextFieldType="TextFieldType.Text" style="width: 100%;">@Localize["Label_LastName"]</FluentTextField>
 
-                        <FluentTextField @bind-Value=@input.ConfirmPassword TextFieldType="TextFieldType.Password" style="width: 100%;">@Localize["Label_Confirm_Password"]</FluentTextField>
-                        
-                        <div style="text-align: right">
-                            <FluentButton Type="ButtonType.Submit" Appearance="Appearance.Accent">@Localize["Btn_Submit"]</FluentButton>
-                        </div>
+            <FluentTextField @bind-Value=@Content.Password TextFieldType="TextFieldType.Password" style="width: 100%;">@Localize["Label_Password"]</FluentTextField>
 
-                    </EditForm>
-                </FluentStack>
-            </FluentGridItem>
-        </FluentGrid>
-    </FluentGridItem>
+            <FluentTextField @bind-Value=@Content.ConfirmPassword TextFieldType="TextFieldType.Password" style="width: 100%;">@Localize["Label_Confirm_Password"]</FluentTextField>
 
-</FluentGrid>
+        </FluentStack>
+    </FluentDialogBody>
+    <FluentDialogFooter>
+        <FluentButton Type="ButtonType.Submit" Appearance="Appearance.Accent">@Localize["Btn_Submit"]</FluentButton>
+        <FluentButton OnClick="@OnCancel">Cancel</FluentButton>
+    </FluentDialogFooter>
 
-
+</EditForm>
 @code {
-    JustifyContent justification = JustifyContent.FlexStart;
-    ErrorMessenger errorMessenger;
-    RegisterViewModel input { get; set; } = new RegisterViewModel();
+
+    ErrorMessenger? ErrorMessenger;
+    // [Parameter]
+    public RegisterViewModel Content { get; set; } = new RegisterViewModel();
+
+    [CascadingParameter]
+    public FluentDialog? Dialog { get; set; }
 
     async Task HandleValidSubmit(EditContext editContext)
     {
-        errorMessenger.Errors.Clear();
+        ErrorMessenger?.Errors.Clear();
 
-        try
-        {
-            ApplicationUser newUser = new ApplicationUser
-                {
-                    UserName = input.Email,
-                    Email = input.Email,
-                    FirstName = input.FirstName ?? string.Empty,
-                    LastName = input.LastName ?? string.Empty
-
-                };
-            var identityResult = await UserManager.CreateAsync(newUser, input.Password);
-            if (identityResult.Succeeded)
+        ApplicationUser newUser = new ApplicationUser
             {
-                Navigation.NavigateTo("/");
-            }
-            else
-            {
-                foreach (var identityError in identityResult.Errors)
-                {
-                    errorMessenger.Errors.Add(identityError.Description);
-                }
-                
-                errorMessenger.ShowErrors();
+                UserName = Content.Email,
+                Email = Content.Email,
+                FirstName = Content.FirstName ?? string.Empty,
+                LastName = Content.LastName ?? string.Empty
 
-            }
-        }
-        catch(Exception exception)
+            };
+
+        var identityResult = await UserManager.CreateAsync(newUser, Content.Password);
+        if (!identityResult.Succeeded)
         {
-            errorMessenger.Errors.Add(exception.Message);
-            errorMessenger.ShowErrors();
-        }
+            foreach (var identityError in identityResult.Errors)
+            {
+                ErrorMessenger?.Errors.Add(identityError.Description);
+            }
 
+            ErrorMessenger?.ShowErrors();
+
+        }
+        else
+        {
+            if (Dialog is not null)
+            {
+                await Dialog.CloseAsync();
+            }
+
+        }
     }
+
+    async Task OnCancel()
+    {
+        if (Dialog is not null)
+        {
+            await Dialog.CancelAsync();
+        }
+    }
+
 }

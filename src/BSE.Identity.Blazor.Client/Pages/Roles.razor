@@ -1,19 +1,90 @@
 ﻿@page "/roles"
 
 @using BSE.Identity.Blazor.Client.Pages.Shared
+@using BSE.Identity.Blazor.Client.ViewModels;
+@using Microsoft.AspNetCore.Identity
 
-@inject IStringLocalizer<Register> Localize
+@inject RoleManager<IdentityRole> RoleManager
+@inject IStringLocalizer<Roles> Localize
+@inject IDialogService DialogService
+@inject NavigationManager Navigation
 
 <FluentDialogProvider />
 
 <PageTitle>@Localize["Txt_PageTitle"]</PageTitle>
 
-
 <NavigationBar/>
 
+<FluentToolbar Style="width: 100%; border: 1px solid var(--accent-fill-rest)">
+    <FluentLabel Typo="@Typography.PageTitle">@Localize["Txt_PageHeader"]</FluentLabel>
+    <FluentButton slot="end" Appearance="Appearance.Accent" OnClick="@OnCreateRole">
+        <FluentIcon Slot="start" Value="@(new Icons.Regular.Size16.FolderPerson())" Color="Color.Fill" />
+        @Localize["Btn_NewRole"]
+    </FluentButton>
+</FluentToolbar>
+
+<FluentLabel Typo="@Typography.Header" Style="margin-top: 20px">@Localize["Txt_GridHeader"]</FluentLabel>
+
+<FluentDataGrid Items="@RolesList" Virtualize="true" ItemSize="40" role="grid" TGridItem="RoleViewModel">
+    <PropertyColumn Property="@(u => u.Name)" Title="@Localize["Grid_Column_RoleName"]" Sortable="true" />
+    <TemplateColumn Title="Actions" Align="@Align.End">
+        <FluentButton Appearance="Appearance.Accent" OnClick="@(() => OnEditRole(context))">
+            <FluentIcon Value="@(new Icons.Regular.Size16.Edit())" Style="fill: var(--foreground-on-accent-rest)" />
+        </FluentButton>
+        @* <FluentButton Appearance="Appearance.Accent" OnClick="@(() => OnDeleteUser(context))">
+            <FluentIcon Value="@(new Icons.Regular.Size16.Delete())" Style="fill: var(--foreground-on-accent-rest)" />
+        </FluentButton> *@
+    </TemplateColumn>
+</FluentDataGrid>
+
 @code {
+
+    IQueryable<RoleViewModel>? RolesList;
+
     protected override Task OnInitializedAsync()
     {
+        var roles = RoleManager.Roles.Select(role => new RoleViewModel
+            {
+                Id = role.Id,
+                Name = role.Name
+            }).ToList();
+        RolesList = roles.AsQueryable();
+
         return base.OnInitializedAsync();
     }
+
+    async Task OnCreateRole()
+    {
+        var dialog = await DialogService.ShowDialogAsync<CreateRole>(new DialogParameters()
+            {
+                OnDialogResult = DialogService.CreateDialogCallback(this, OnRoleCreated),
+                Modal = true,
+                PreventDismissOnOverlayClick = true,
+                
+            });
+    }
+
+    void OnEditRole(RoleViewModel model)
+    {
+
+    }
+
+    async Task OnRoleCreated(DialogResult result)
+    {
+        if (!result.Cancelled)
+        {
+            RolesList = GetRoles();
+        }
+    }
+
+    private IQueryable<RoleViewModel> GetRoles()
+    {
+        var roles = RoleManager.Roles.Select(role => new RoleViewModel
+            {
+                Id = role.Id,
+                Name = role.Name
+            }).ToList();
+        return roles.AsQueryable();
+    }
+    
 }

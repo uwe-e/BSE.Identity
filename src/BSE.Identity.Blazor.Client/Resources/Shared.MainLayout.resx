@@ -130,6 +130,6 @@
     <value>Sign in</value>
   </data>
   <data name="Txt_PageHeader" xml:space="preserve">
-    <value>Client Manager</value>
+    <value>Identity Manager</value>
   </data>
 </root>

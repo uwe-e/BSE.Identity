@@ -16,26 +16,18 @@
 
 <PageTitle>@Localize["Txt_PageTitle"]</PageTitle>
 
-@* <FluentToolbar Style="width: 100%">
-    <FluentButton slot="start" Appearance="Appearance.Outline" OnClick="@OnRegisterUser" Disabled>
-        <FluentIcon Slot="start" Value="@(new Icons.Regular.Size16.PeopleList())" Color="Color.Accent" />
-        User Management
-    </FluentButton>
-    <FluentButton Appearance="Appearance.Stealth" OnClick="@OnRegisterUser">
-        <FluentIcon Slot="start" Value="@(new Icons.Regular.Size16.FolderPerson())" Color="Color.Accent" />
-        Role Management
-    </FluentButton>
-</FluentToolbar> *@
 <NavigationBar/>
 
-<FluentLabel Typo="@Typography.H2">@Localize["Txt_PageHeader"]</FluentLabel>
-
-<FluentToolbar Style="width: 100%">
-    <FluentButton slot="end" Appearance="Appearance.Accent" OnClick="@OnRegisterUser">
+<FluentToolbar Style="width: 100%; border: 1px solid var(--accent-fill-rest)">
+    <FluentLabel Typo="@Typography.PageTitle">@Localize["Txt_PageHeader"]</FluentLabel>
+    <FluentButton slot="end" Appearance="Appearance.Accent" OnClick="@OnCreateUser">
         <FluentIcon Slot="start" Value="@(new Icons.Regular.Size16.PeopleAdd())" Color="Color.Fill" />
-        New User
+        @Localize["Btn_NewUser"]
     </FluentButton>
 </FluentToolbar>
+
+
+<FluentLabel Typo="@Typography.Header" Style="margin-top: 20px">@Localize["Txt_GridHeader"]</FluentLabel>
 
 <FluentDataGrid id="manualGrid" Items="@Users" Virtualize="true" ItemSize="40" role="grid" TGridItem="UserRolesViewModel">
     <PropertyColumn Property="@(u => u.UserName)" Title="@Localize["Grid_Column_UserName"]" Sortable="true" />
@@ -63,15 +55,27 @@
         return base.OnInitializedAsync();
     }
 
-
-    void OnRegisterUser()
+    async Task OnCreateUser()
     {
-        Navigation.NavigateTo("/Register");
+        var dialog = await DialogService.ShowDialogAsync<Register>(new DialogParameters()
+            {
+                OnDialogResult = DialogService.CreateDialogCallback(this, OnUserCreated),
+                Modal = true,
+                PreventDismissOnOverlayClick = true,
+            });
     }
 
     void OnEditUser(UserRolesViewModel model)
     {
         Navigation.NavigateTo($"/edit/{model.UserId}");
+    }
+
+    async Task OnUserCreated(DialogResult result)
+    {
+        if (!result.Cancelled)
+        {
+            Users = GetApplicationUsers();
+        }
     }
 
     async Task OnDeleteUser(UserRolesViewModel model)

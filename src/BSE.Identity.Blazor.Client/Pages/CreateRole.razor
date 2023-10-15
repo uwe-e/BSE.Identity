@@ -1,0 +1,90 @@
+﻿@using BSE.Identity.Blazor.Client.ViewModels;
+@using Microsoft.AspNetCore.Identity;
+@using BSE.Identity.Blazor.Client.Pages.Shared
+
+@implements IDialogContentComponent<RoleViewModel>
+
+@inject RoleManager<IdentityRole> RoleManager
+@inject IStringLocalizer<CreateRole> Localize
+
+<EditForm Model="@Content" OnValidSubmit="@HandleValidSubmit">
+    <FluentDialogHeader ShowDismiss="true">
+        <FluentStack VerticalAlignment="VerticalAlignment.Center">
+            <FluentIcon Value="@(new Icons.Regular.Size24.FolderPeople())" />
+            <FluentLabel Typo="Typography.PaneHeader">
+                @Localize["Txt_PageHeader"]
+            </FluentLabel>
+        </FluentStack>
+
+    </FluentDialogHeader>
+
+    <FluentDialogBody>
+        <FluentStack Orientation="Orientation.Vertical">
+
+            <DataAnnotationsValidator />
+            <FluentValidationSummary />
+            <ErrorMessenger @ref="ErrorMessenger" />
+
+            <FluentTextField @bind-Value=@Content.Name TextFieldType="TextFieldType.Text" Spellcheck="true" style="width: 100%;">@Localize["Label_RoleName"]</FluentTextField>
+
+        </FluentStack>
+    </FluentDialogBody>
+    <FluentDialogFooter>
+        <FluentButton Type="ButtonType.Submit" Appearance="Appearance.Accent">@Localize["Btn_Submit"]</FluentButton>
+        <FluentButton OnClick="@OnCancel">>@Localize["Btn_Cancel"]</FluentButton>
+    </FluentDialogFooter>
+    </EditForm>
+
+@code {
+    ErrorMessenger? ErrorMessenger;
+
+    public RoleViewModel Content { get; set; } = new RoleViewModel();
+
+    [Parameter]
+    public EditMode Mode { get; set; } = EditMode.None;
+
+    [CascadingParameter]
+    public FluentDialog? Dialog { get; set; }
+
+    protected override Task OnInitializedAsync()
+    {
+        return base.OnInitializedAsync();
+    }
+
+    async Task HandleValidSubmit(EditContext editContext)
+    {
+        ErrorMessenger?.Errors.Clear();
+
+        IdentityRole newRole = new IdentityRole
+            {
+                Name = Content.Name
+            };
+
+        var identityResult = await RoleManager.CreateAsync(newRole);
+        if (!identityResult.Succeeded)
+        {
+            foreach (var identityError in identityResult.Errors)
+            {
+                ErrorMessenger?.Errors.Add(identityError.Description);
+            }
+
+            ErrorMessenger?.ShowErrors();
+
+        }
+        else
+        {
+            if (Dialog is not null)
+            {
+                await Dialog.CloseAsync();
+            }
+        }
+    }
+
+    async Task OnCancel()
+    {
+        if (Dialog is not null)
+        {
+            await Dialog.CancelAsync();
+        }
+    }
+}

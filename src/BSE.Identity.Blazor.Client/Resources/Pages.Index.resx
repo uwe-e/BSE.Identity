@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Btn_NewUser" xml:space="preserve">
+    <value>New User</value>
+  </data>
   <data name="Dlg_Result_No" xml:space="preserve">
     <value>No</value>
   </data>
@@ -141,10 +144,13 @@
   <data name="Grid_Column_UserName" xml:space="preserve">
     <value>Name</value>
   </data>
-  <data name="Txt_PageHeader" xml:space="preserve">
+  <data name="Txt_GridHeader" xml:space="preserve">
     <value>User Accounts</value>
   </data>
+  <data name="Txt_PageHeader" xml:space="preserve">
+    <value>User Management</value>
+  </data>
   <data name="Txt_PageTitle" xml:space="preserve">
-    <value>Users</value>
+    <value>User Management</value>
   </data>
 </root>

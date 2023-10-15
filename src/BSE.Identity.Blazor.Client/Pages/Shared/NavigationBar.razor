@@ -1,19 +1,19 @@
 ﻿@inject NavigationManager Navigation
-
+@inject IStringLocalizer<NavigationBar> Localize
 
 <FluentToolbar Style="width: 100%">
-    <FluentButton slot="start" OnClick="@OnNavigateToUserManagement" Disabled="_disabled == EnabledNavigation.None">
+    <FluentButton slot="start" OnClick="@OnNavigateToUserManagement" Disabled="_disabled == NavBarViewState.None">
         <FluentIcon Slot="start" Value="@(new Icons.Regular.Size16.PeopleList())" Color="Color.Accent" />
-        User Management
+        @Localize["Btn_UserManagement"]
     </FluentButton>
-    <FluentButton OnClick="@OnNavigateToRoleManagement" Disabled="_disabled == EnabledNavigation.Roles">
+    <FluentButton OnClick="@OnNavigateToRoleManagement" Disabled="_disabled == NavBarViewState.Roles">
         <FluentIcon Slot="start" Value="@(new Icons.Regular.Size16.FolderPerson())" Color="Color.Accent" />
-        Role Management
+        @Localize["Btn_RoleManagement"]
     </FluentButton>
 </FluentToolbar>
 
 @code {
-    EnabledNavigation _disabled;
+    NavBarViewState _disabled;
 
     void OnNavigateToUserManagement()
     {
@@ -28,12 +28,12 @@
     protected override Task OnInitializedAsync()
     {
         var route = Navigation.ToBaseRelativePath(Navigation.Uri);
-        Enum.TryParse<EnabledNavigation>(route?.ToUpperFirstChar(), out _disabled);
+        Enum.TryParse<NavBarViewState>(route?.ToUpperFirstChar(), out _disabled);
 
         return base.OnInitializedAsync();
     }
 
-    enum EnabledNavigation
+    enum NavBarViewState
     {
         None,
         Roles

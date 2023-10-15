@@ -35,6 +35,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Update="Resources\Pages.Roles.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Update="Resources\Shared.LoginDisplay.resx">
       <SubType>Designer</SubType>
     </EmbeddedResource>
