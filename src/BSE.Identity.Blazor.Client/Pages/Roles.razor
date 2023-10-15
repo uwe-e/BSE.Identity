@@ -43,30 +43,35 @@
 
     protected override Task OnInitializedAsync()
     {
-        var roles = RoleManager.Roles.Select(role => new RoleViewModel
-            {
-                Id = role.Id,
-                Name = role.Name
-            }).ToList();
-        RolesList = roles.AsQueryable();
+        RolesList = GetRoles();
 
         return base.OnInitializedAsync();
     }
 
     async Task OnCreateRole()
     {
-        var dialog = await DialogService.ShowDialogAsync<CreateRole>(new DialogParameters()
+        /*
+        * If we have an existing model, we date up. If not we create a new one
+        */
+        var dialog = await DialogService.ShowDialogAsync<EditRole>(new DialogParameters()
             {
                 OnDialogResult = DialogService.CreateDialogCallback(this, OnRoleCreated),
                 Modal = true,
-                PreventDismissOnOverlayClick = true,
-                
+                PreventDismissOnOverlayClick = true
             });
     }
 
-    void OnEditRole(RoleViewModel model)
+    async Task OnEditRole(RoleViewModel model)
     {
-
+        /*
+        * If we have an existing model, we date up. If not we create a new one
+        */
+        var dialog = await DialogService.ShowDialogAsync<EditRole>(model, new DialogParameters()
+            {
+                OnDialogResult = DialogService.CreateDialogCallback(this, OnRoleCreated),
+                Modal = true,
+                PreventDismissOnOverlayClick = true
+            });
     }
 
     async Task OnRoleCreated(DialogResult result)
@@ -75,6 +80,7 @@
         {
             RolesList = GetRoles();
         }
+        await Task.CompletedTask;
     }
 
     private IQueryable<RoleViewModel> GetRoles()
@@ -86,5 +92,5 @@
             }).ToList();
         return roles.AsQueryable();
     }
-    
+
 }

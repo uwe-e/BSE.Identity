@@ -126,7 +126,10 @@
   <data name="Label_RoleName" xml:space="preserve">
     <value>Name</value>
   </data>
-  <data name="Txt_PageHeader" xml:space="preserve">
+  <data name="Txt_PageHeader_NewRole" xml:space="preserve">
     <value>Create a new role</value>
+  </data>
+  <data name="Txt_PageHeader_UpdateRole" xml:space="preserve">
+    <value>Update an existing role</value>
   </data>
 </root>

@@ -5,14 +5,14 @@
 @implements IDialogContentComponent<RoleViewModel>
 
 @inject RoleManager<IdentityRole> RoleManager
-@inject IStringLocalizer<CreateRole> Localize
+@inject IStringLocalizer<EditRole> Localize
 
 <EditForm Model="@Content" OnValidSubmit="@HandleValidSubmit">
     <FluentDialogHeader ShowDismiss="true">
         <FluentStack VerticalAlignment="VerticalAlignment.Center">
             <FluentIcon Value="@(new Icons.Regular.Size24.FolderPeople())" />
             <FluentLabel Typo="Typography.PaneHeader">
-                @Localize["Txt_PageHeader"]
+                @_pageHeader
             </FluentLabel>
         </FluentStack>
 
@@ -31,23 +31,24 @@
     </FluentDialogBody>
     <FluentDialogFooter>
         <FluentButton Type="ButtonType.Submit" Appearance="Appearance.Accent">@Localize["Btn_Submit"]</FluentButton>
-        <FluentButton OnClick="@OnCancel">>@Localize["Btn_Cancel"]</FluentButton>
+        <FluentButton OnClick="@OnCancel">@Localize["Btn_Cancel"]</FluentButton>
     </FluentDialogFooter>
-    </EditForm>
+</EditForm>
 
 @code {
     ErrorMessenger? ErrorMessenger;
 
-    public RoleViewModel Content { get; set; } = new RoleViewModel();
-
     [Parameter]
-    public EditMode Mode { get; set; } = EditMode.None;
+    public RoleViewModel Content { get; set; } = new RoleViewModel();
 
     [CascadingParameter]
     public FluentDialog? Dialog { get; set; }
 
+    string? _pageHeader;
+
     protected override Task OnInitializedAsync()
     {
+        _pageHeader = Content?.Id == null ? Localize["Txt_PageHeader_NewRole"] : Localize["Txt_PageHeader_UpdateRole"];
         return base.OnInitializedAsync();
     }
 
@@ -55,12 +56,25 @@
     {
         ErrorMessenger?.Errors.Clear();
 
-        IdentityRole newRole = new IdentityRole
+        IdentityRole identityRole = new IdentityRole
             {
                 Name = Content.Name
             };
 
-        var identityResult = await RoleManager.CreateAsync(newRole);
+        IdentityResult identityResult;
+        /*
+         * If there's a roleId, the content was created outside of the dialog.
+         * In this case we update an existing role, otherwise we create a new role.
+        */
+        if (Guid.TryParse(Content?.Id, out Guid roleId)){
+            identityRole.Id = roleId.ToString();
+            identityResult = await RoleManager.UpdateAsync(identityRole);
+        }
+        else
+        {
+            identityResult = await RoleManager.CreateAsync(identityRole);
+        }
+
         if (!identityResult.Succeeded)
         {
             foreach (var identityError in identityResult.Errors)
