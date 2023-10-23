@@ -1,4 +1,6 @@
-﻿namespace BSE.Identity.Blazor.Client.Models
+﻿using BSE.Identity.Blazor.Client.ViewModels;
+
+namespace BSE.Identity.Blazor.Client.Models
 {
     public class UserRolesViewModel
     {
@@ -8,5 +10,7 @@
         public string UserName { get; set; }
         public string Email { get; set; }
         public IEnumerable<string> Roles { get; set; }
+
+        public IEnumerable<RoleViewModel> Roles123 { get; set; }
     }
 }

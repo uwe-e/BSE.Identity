@@ -3,6 +3,7 @@
 @using BSE.Identity.Blazor.Client.Models;
 @using BSE.Identity.Blazor.Client.Pages.Shared
 @using BSE.Identity.Blazor.Client.Threading;
+@using BSE.Identity.Blazor.Client.ViewModels;
 @using Microsoft.Fast.Components.FluentUI
 @using Microsoft.AspNetCore.Identity
 
@@ -33,7 +34,9 @@
     <PropertyColumn Property="@(u => u.UserName)" Title="@Localize["Grid_Column_UserName"]" Sortable="true" />
     <PropertyColumn Property="@(u => u.FirstName)" Title="@Localize["Grid_Column_FirstName"]" Sortable="true" />
     <PropertyColumn Property="@(u => u.LastName)" Title="@Localize["Grid_Column_FirstName"]" Sortable="true" />
-    <PropertyColumn Property="@(u => string.Join(' ' ,u.Roles))" Title="@Localize["Grid_Column_Roles"]" Sortable="true" />
+    @* <PropertyColumn Property="@(u => string.Join(' ' ,u.Roles))" Title="@Localize["Grid_Column_Roles"]" Sortable="true" /> *@
+    @* <PropertyColumn Property="@(u => u.Roles123.Select(r => string.Join(' ' ,r.Name)))" Title="@Localize["Grid_Column_Roles"]" Sortable="true" /> *@
+    <PropertyColumn Property="@(u => GetRoleNames(u.Roles123))" Title="@Localize["Grid_Column_Roles"]" Sortable="true" />
     <TemplateColumn Title="Actions" Align="@Align.End">
         <FluentButton Appearance="Appearance.Accent" OnClick="@(() => OnEditUser(context))">
             <FluentIcon Value="@(new Icons.Regular.Size16.Edit())" Style="fill: var(--foreground-on-accent-rest)" />
@@ -55,9 +58,15 @@
         return base.OnInitializedAsync();
     }
 
+    string GetRoleNames(IEnumerable<RoleViewModel> roles)
+    {
+        var m = roles?.Select(r => r.Name);
+        return "Test";
+    }
+
     async Task OnCreateUser()
     {
-        var dialog = await DialogService.ShowDialogAsync<Register>(new DialogParameters()
+        var dialog = await DialogService.ShowDialogAsync<CreateUser>(new DialogParameters()
             {
                 OnDialogResult = DialogService.CreateDialogCallback(this, OnUserCreated),
                 Modal = true,
@@ -65,9 +74,15 @@
             });
     }
 
-    void OnEditUser(UserRolesViewModel model)
+    async Task OnEditUser(UserRolesViewModel model)
     {
-        Navigation.NavigateTo($"/edit/{model.UserId}");
+
+        var dialog = await DialogService.ShowDialogAsync<EditUser>(model, new DialogParameters()
+            {
+                OnDialogResult = DialogService.CreateDialogCallback(this, OnUserCreated),
+                Modal = true,
+                PreventDismissOnOverlayClick = true
+            });
     }
 
     async Task OnUserCreated(DialogResult result)
@@ -76,6 +91,7 @@
         {
             Users = GetApplicationUsers();
         }
+        await Task.CompletedTask;
     }
 
     async Task OnDeleteUser(UserRolesViewModel model)
@@ -105,10 +121,10 @@
     private IQueryable<UserRolesViewModel> GetApplicationUsers()
     {
         /*
-         * this is because of that MySQL behaviour
-         * https://mysqlconnector.net/troubleshooting/connection-reuse/
-         *
-         * the original query should be the use of UserManager.GetRolesAsync(user)
+        * this is because of that MySQL behaviour
+        * https://mysqlconnector.net/troubleshooting/connection-reuse/
+        *
+        * the original query should be the use of UserManager.GetRolesAsync(user)
         */
         var users = UserManager.Users;
         var usersWithRoles = (from user in users
@@ -122,9 +138,19 @@
                                   {
                                       UserId = user.Id,
                                       UserName = user.UserName,
+                                      Email = user.Email,
                                       FirstName = user.FirstName,
                                       LastName = user.LastName,
-                                      Roles = new List<string> { r.Name }
+                                      Roles = new List<string> { r.Name },
+                                      Roles123 = new List<RoleViewModel>
+                                      {
+                                          new RoleViewModel
+                                          {
+                                              Id = r.Id,
+                                              Name = r.Name,
+                                              IsSelected = !String.IsNullOrEmpty(r.Id)
+                                          }
+                                      }
                                   }).ToList();
 
         return usersWithRoles.AsQueryable();

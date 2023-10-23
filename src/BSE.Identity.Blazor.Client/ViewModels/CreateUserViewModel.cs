@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace BSE.Identity.Blazor.Client.Models
 {
-    public class RegisterViewModel : LoginViewModel
+    public class CreateUserViewModel : LoginViewModel
     {
         public string? FirstName
         {

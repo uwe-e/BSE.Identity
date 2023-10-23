@@ -1,4 +1,4 @@
-﻿@implements IDialogContentComponent<RegisterViewModel>
+﻿@implements IDialogContentComponent<CreateUserViewModel>
 
 @using BSE.Identity.Blazor.Client.Models;
 @using BSE.Identity.Blazor.Client.Pages.Shared
@@ -7,7 +7,7 @@
 @using Microsoft.AspNetCore.Identity;
 
 @inject UserManager<ApplicationUser> UserManager
-@inject IStringLocalizer<Register> Localize
+@inject IStringLocalizer<CreateUser> Localize
 
 <EditForm Model="@Content" OnValidSubmit="@HandleValidSubmit">
     <FluentDialogHeader ShowDismiss="true">
@@ -48,8 +48,9 @@
 @code {
 
     ErrorMessenger? ErrorMessenger;
-    // [Parameter]
-    public RegisterViewModel Content { get; set; } = new RegisterViewModel();
+    
+    [Parameter]
+    public CreateUserViewModel Content { get; set; } = new CreateUserViewModel();
 
     [CascadingParameter]
     public FluentDialog? Dialog { get; set; }
