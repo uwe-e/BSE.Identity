@@ -34,9 +34,7 @@
     <PropertyColumn Property="@(u => u.UserName)" Title="@Localize["Grid_Column_UserName"]" Sortable="true" />
     <PropertyColumn Property="@(u => u.FirstName)" Title="@Localize["Grid_Column_FirstName"]" Sortable="true" />
     <PropertyColumn Property="@(u => u.LastName)" Title="@Localize["Grid_Column_FirstName"]" Sortable="true" />
-    @* <PropertyColumn Property="@(u => string.Join(' ' ,u.Roles))" Title="@Localize["Grid_Column_Roles"]" Sortable="true" /> *@
-    @* <PropertyColumn Property="@(u => u.Roles123.Select(r => string.Join(' ' ,r.Name)))" Title="@Localize["Grid_Column_Roles"]" Sortable="true" /> *@
-    <PropertyColumn Property="@(u => GetRoleNames(u.Roles123))" Title="@Localize["Grid_Column_Roles"]" Sortable="true" />
+    <PropertyColumn Property="@(u => string.Join(", ", u.Roles123.Select(r => r.Name)))" Title="@Localize["Grid_Column_Roles"]" Sortable="true" />
     <TemplateColumn Title="Actions" Align="@Align.End">
         <FluentButton Appearance="Appearance.Accent" OnClick="@(() => OnEditUser(context))">
             <FluentIcon Value="@(new Icons.Regular.Size16.Edit())" Style="fill: var(--foreground-on-accent-rest)" />
@@ -49,19 +47,11 @@
 
 @code {
     IQueryable<UserRolesViewModel>? Users;
-    // SerialQueue serialQueue = new SerialQueue();
-    // List<Task<UserRolesViewModel>> createUserRolesViewModelTasks = new List<Task<UserRolesViewModel>>();
 
     protected override Task OnInitializedAsync()
     {
         Users = GetApplicationUsers();
         return base.OnInitializedAsync();
-    }
-
-    string GetRoleNames(IEnumerable<RoleViewModel> roles)
-    {
-        var m = roles?.Select(r => r.Name);
-        return "Test";
     }
 
     async Task OnCreateUser()
@@ -126,68 +116,27 @@
         *
         * the original query should be the use of UserManager.GetRolesAsync(user)
         */
-        var users = UserManager.Users;
-        var usersWithRoles = (from user in users
-                              join userrole in _context.UserRoles
-                              on user.Id equals userrole.UserId into userRolesGroup
-                              from ur in userRolesGroup.DefaultIfEmpty()
-                              join role in _context.Roles
-                              on ur.RoleId equals role.Id into rolesGrpup
-                              from r in rolesGrpup.DefaultIfEmpty()
-                              select new UserRolesViewModel
-                                  {
-                                      UserId = user.Id,
-                                      UserName = user.UserName,
-                                      Email = user.Email,
-                                      FirstName = user.FirstName,
-                                      LastName = user.LastName,
-                                      Roles = new List<string> { r.Name },
-                                      Roles123 = new List<RoleViewModel>
-                                      {
-                                          new RoleViewModel
-                                          {
-                                              Id = r.Id,
-                                              Name = r.Name,
-                                              IsSelected = !String.IsNullOrEmpty(r.Id)
-                                          }
-                                      }
-                                  }).ToList();
+        var usersWithRoles = UserManager.Users.GroupJoin(
+            _context.UserRoles,
+            user => user.Id,
+            userrole => userrole.UserId,
+            (user, userroles) => new UserRolesViewModel
+                {
+                    UserId = user.Id,
+                    UserName = user.UserName,
+                    Email = user.Email,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Roles123 = userroles.Select(ur => new RoleViewModel
+                    {
+                        Id = ur.RoleId,
+                        IsSelected = true,
+                        Name = _context.Roles
+                        .Where(r => r.Id.Equals(ur.RoleId))
+                        .Select(r => r.Name).First()
+                    })
+                }).ToList<UserRolesViewModel>();
 
         return usersWithRoles.AsQueryable();
     }
-
-    // private IQueryable<UserRolesViewModel> GetApplicationUsers()
-    // {
-    //     var users = UserManager.Users.AsEnumerable<ApplicationUser>();
-    //     foreach (var applicationUser in users)
-    //     {
-    //         /*
-    //         * this is because of that MySQL behaviour
-    //         * https://mysqlconnector.net/troubleshooting/connection-reuse/
-    //         */
-    //         createUserRolesViewModelTasks.Add(serialQueue.Enqueue<UserRolesViewModel>(async () =>
-    //         {
-    //             return await GetUserWithRoles(applicationUser);
-    //         }));
-    //     }
-
-    //     return createUserRolesViewModelTasks.Select(x => x.Result).AsQueryable();
-    // }
-
-    // private async Task<UserRolesViewModel> GetUserWithRoles(ApplicationUser applicationUser)
-    // {
-    //     return new UserRolesViewModel
-    //         {
-    //             UserId = applicationUser.Id,
-    //             UserName = applicationUser.UserName,
-    //             FirstName = applicationUser.FirstName,
-    //             LastName = applicationUser.LastName,
-    //             Roles = await UserManager.GetRolesAsync(applicationUser)
-    //         };
-    // }
-
-    // private async Task<IList<string>> GetRolesAsync(ApplicationUser applicationUser)
-    // {
-    //     return await UserManager.GetRolesAsync(applicationUser);
-    // }
 }
