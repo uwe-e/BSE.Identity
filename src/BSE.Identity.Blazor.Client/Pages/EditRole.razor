@@ -2,6 +2,8 @@
 @using Microsoft.AspNetCore.Identity;
 @using BSE.Identity.Blazor.Client.Pages.Shared
 
+@inherits EditFormDialogBase;
+
 @implements IDialogContentComponent<RoleViewModel>
 
 @inject RoleManager<IdentityRole> RoleManager
@@ -36,13 +38,9 @@
 </EditForm>
 
 @code {
-    ErrorMessenger? ErrorMessenger;
 
     [Parameter]
     public RoleViewModel Content { get; set; } = new RoleViewModel();
-
-    [CascadingParameter]
-    public FluentDialog? Dialog { get; set; }
 
     string? _pageHeader;
 
@@ -52,53 +50,58 @@
         return base.OnInitializedAsync();
     }
 
-    async Task HandleValidSubmit(EditContext editContext)
+    protected override async Task HandleValidSubmit(EditContext editContext)
     {
         ErrorMessenger?.Errors.Clear();
-
-        IdentityRole identityRole = new IdentityRole
-            {
-                Name = Content.Name
-            };
-
-        IdentityResult identityResult;
-        /*
-         * If there's a roleId, the content was created outside of the dialog.
-         * In this case we update an existing role, otherwise we create a new role.
-        */
-        if (Guid.TryParse(Content?.Id, out Guid roleId)){
-            identityRole.Id = roleId.ToString();
-            identityResult = await RoleManager.UpdateAsync(identityRole);
-        }
-        else
+        try
         {
-            identityResult = await RoleManager.CreateAsync(identityRole);
-        }
 
-        if (!identityResult.Succeeded)
-        {
-            foreach (var identityError in identityResult.Errors)
+
+            IdentityResult identityResult = null;
+            /*
+            * If there's a roleId, the content was created outside of the dialog.
+            * In this case we update an existing role, otherwise we create a new role.
+            */
+            if (Guid.TryParse(Content?.Id, out Guid roleId))
             {
-                ErrorMessenger?.Errors.Add(identityError.Description);
+                IdentityRole identityRole = await RoleManager.FindByIdAsync(roleId.ToString());
+                if (identityRole is not null)
+                {
+                    identityRole.Name = Content.Name;
+                    identityResult = await RoleManager.UpdateAsync(identityRole);
+                }
+
+            }
+            else
+            {
+                IdentityRole identityRole = new IdentityRole
+                    {
+                        Name = Content?.Name
+                    };
+                identityResult = await RoleManager.CreateAsync(identityRole);
             }
 
-            ErrorMessenger?.ShowErrors();
-
-        }
-        else
-        {
-            if (Dialog is not null)
+            if (identityResult != null && !identityResult.Succeeded)
             {
-                await Dialog.CloseAsync();
+                foreach (var identityError in identityResult.Errors)
+                {
+                    ErrorMessenger?.Errors.Add(identityError.Description);
+                }
+
+                ErrorMessenger?.ShowErrors();
+
+            }
+            else
+            {
+                if (Dialog is not null)
+                {
+                    await Dialog.CloseAsync();
+                }
             }
         }
-    }
-
-    async Task OnCancel()
-    {
-        if (Dialog is not null)
+        catch (Exception ex)
         {
-            await Dialog.CancelAsync();
+
         }
     }
 }

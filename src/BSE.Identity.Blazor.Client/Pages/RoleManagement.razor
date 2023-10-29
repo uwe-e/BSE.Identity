@@ -88,8 +88,9 @@
         var roles = RoleManager.Roles.Select(role => new RoleViewModel
             {
                 Id = role.Id,
-                Name = role.Name
-            }).ToList();
+                Name = role.Name ?? string.Empty
+            }).OrderBy(r => r.Name)
+            .ToList();
         return roles.AsQueryable();
     }
 
