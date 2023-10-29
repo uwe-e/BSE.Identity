@@ -6,6 +6,8 @@
 @using BSE.Identity.Blazor.Client.ViewModels;
 @using Microsoft.AspNetCore.Identity;
 
+@inherits EditFormDialogBase;
+
 @inject UserManager<ApplicationUser> UserManager
 @inject IStringLocalizer<CreateUser> Localize
 
@@ -47,15 +49,10 @@
 </EditForm>
 @code {
 
-    ErrorMessenger? ErrorMessenger;
-    
     [Parameter]
     public CreateUserViewModel Content { get; set; } = new CreateUserViewModel();
 
-    [CascadingParameter]
-    public FluentDialog? Dialog { get; set; }
-
-    async Task HandleValidSubmit(EditContext editContext)
+    protected override async Task HandleValidSubmit(EditContext editContext)
     {
         ErrorMessenger?.Errors.Clear();
 
@@ -88,13 +85,4 @@
 
         }
     }
-
-    async Task OnCancel()
-    {
-        if (Dialog is not null)
-        {
-            await Dialog.CancelAsync();
-        }
-    }
-
 }

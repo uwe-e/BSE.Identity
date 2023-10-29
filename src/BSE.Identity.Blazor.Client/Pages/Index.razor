@@ -33,7 +33,7 @@
 <FluentDataGrid id="manualGrid" Items="@Users" Virtualize="true" ItemSize="40" role="grid" TGridItem="UserRolesViewModel">
     <PropertyColumn Property="@(u => u.UserName)" Title="@Localize["Grid_Column_UserName"]" Sortable="true" />
     <PropertyColumn Property="@(u => u.FirstName)" Title="@Localize["Grid_Column_FirstName"]" Sortable="true" />
-    <PropertyColumn Property="@(u => u.LastName)" Title="@Localize["Grid_Column_FirstName"]" Sortable="true" />
+    <PropertyColumn Property="@(u => u.LastName)" Title="@Localize["Grid_Column_LastName"]" Sortable="true" />
     <PropertyColumn Property="@(u => string.Join(", ", u.Roles123.Select(r => r.Name)))" Title="@Localize["Grid_Column_Roles"]" Sortable="true" />
     <TemplateColumn Title="Actions" Align="@Align.End">
         <FluentButton Appearance="Appearance.Accent" OnClick="@(() => OnEditUser(context))">
