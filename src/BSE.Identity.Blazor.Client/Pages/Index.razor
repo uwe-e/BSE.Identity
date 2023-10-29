@@ -29,7 +29,7 @@
 
 
 <FluentLabel Typo="@Typography.Header" Style="margin-top: 20px">@Localize["Txt_GridHeader"]</FluentLabel>
-
+@* <FluentProgressRing style="width: 102px; height: 102px;"></FluentProgressRing> *@
 <FluentDataGrid id="manualGrid" Items="@Users" Virtualize="true" ItemSize="40" role="grid" TGridItem="UserRolesViewModel">
     <PropertyColumn Property="@(u => u.UserName)" Title="@Localize["Grid_Column_UserName"]" Sortable="true" />
     <PropertyColumn Property="@(u => u.FirstName)" Title="@Localize["Grid_Column_FirstName"]" Sortable="true" />
@@ -47,6 +47,8 @@
 
 @code {
     IQueryable<UserRolesViewModel>? Users;
+
+    bool IsBusy;
 
     protected override Task OnInitializedAsync()
     {
@@ -134,8 +136,8 @@
                         Name = _context.Roles
                         .Where(r => r.Id.Equals(ur.RoleId))
                         .Select(r => r.Name).First()
-                    })
-                }).ToList<UserRolesViewModel>();
+                    }).OrderBy(r => r.Name)
+                }).OrderBy(u => u.Email).ToList<UserRolesViewModel>();
 
         return usersWithRoles.AsQueryable();
     }

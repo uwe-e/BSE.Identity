@@ -2,15 +2,23 @@
 @inject IStringLocalizer<MainLayout> Localize
 
 <PageTitle>BSE.Identity.Blazor.Client</PageTitle>
-
-<div class="content">
+<header>
+    <FluentToolbar id="toolbar-fluent-components" style="width:100%">
+        <img src="/bse-logo-57x57.png" alt="My Logo" /><FluentLabel Typo="@Typography.H2">@Localize["Txt_PageHeader"]</FluentLabel>
+        <LoginDisplay />
+    </FluentToolbar>
+</header>
+<main>
+    <article class="content px-4">
+        @Body
+    </article>
+</main>
+<footer>
+    footr
+</footer>
+@* <div class="content">
     <main>
-        <FluentToolbar id="toolbar-fluent-components" style="width:100%">
-                <img src="/bse-logo-57x57.png" alt="My Logo" /><FluentLabel Typo="@Typography.H2">@Localize["Txt_PageHeader"]</FluentLabel>
-            <LoginDisplay />
-        </FluentToolbar>
-        <article class="content px-4">
-            @Body
-        </article>
+        
+       
     </main>
-</div>
+</div> *@

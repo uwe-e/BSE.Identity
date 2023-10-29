@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using BSE.Identity.Blazor.Client.Pages.Shared;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.Fast.Components.FluentUI;
 
-namespace BSE.Identity.Blazor.Client.Pages.Shared
+namespace BSE.Identity.Blazor.Client.Pages
 {
     public class EditFormDialogBase : ComponentBase
     {

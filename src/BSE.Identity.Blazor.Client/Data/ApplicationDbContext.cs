@@ -26,7 +26,7 @@ namespace BSE.Identity.Blazor.Client.Data
             //seed admin role
             builder.Entity<IdentityRole>().HasData(new IdentityRole
             {
-                Name = "Administator",
+                Name = "Administrator",
                 NormalizedName = "ADMINISTRATOR",
                 Id = ROLE_ID,
                 ConcurrencyStamp = ROLE_ID
