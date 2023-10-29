@@ -53,55 +53,47 @@
     protected override async Task HandleValidSubmit(EditContext editContext)
     {
         ErrorMessenger?.Errors.Clear();
-        try
+
+        IdentityResult identityResult = null;
+        /*
+        * If there's a roleId, the content was created outside of the dialog.
+        * In this case we update an existing role, otherwise we create a new role.
+        */
+        if (Guid.TryParse(Content?.Id, out Guid roleId))
         {
-
-
-            IdentityResult identityResult = null;
-            /*
-            * If there's a roleId, the content was created outside of the dialog.
-            * In this case we update an existing role, otherwise we create a new role.
-            */
-            if (Guid.TryParse(Content?.Id, out Guid roleId))
+            IdentityRole identityRole = await RoleManager.FindByIdAsync(roleId.ToString());
+            if (identityRole is not null)
             {
-                IdentityRole identityRole = await RoleManager.FindByIdAsync(roleId.ToString());
-                if (identityRole is not null)
-                {
-                    identityRole.Name = Content.Name;
-                    identityResult = await RoleManager.UpdateAsync(identityRole);
-                }
-
-            }
-            else
-            {
-                IdentityRole identityRole = new IdentityRole
-                    {
-                        Name = Content?.Name
-                    };
-                identityResult = await RoleManager.CreateAsync(identityRole);
+                identityRole.Name = Content.Name;
+                identityResult = await RoleManager.UpdateAsync(identityRole);
             }
 
-            if (identityResult != null && !identityResult.Succeeded)
-            {
-                foreach (var identityError in identityResult.Errors)
-                {
-                    ErrorMessenger?.Errors.Add(identityError.Description);
-                }
-
-                ErrorMessenger?.ShowErrors();
-
-            }
-            else
-            {
-                if (Dialog is not null)
-                {
-                    await Dialog.CloseAsync();
-                }
-            }
         }
-        catch (Exception ex)
+        else
         {
+            IdentityRole identityRole = new IdentityRole
+                {
+                    Name = Content?.Name
+                };
+            identityResult = await RoleManager.CreateAsync(identityRole);
+        }
 
+        if (identityResult != null && !identityResult.Succeeded)
+        {
+            foreach (var identityError in identityResult.Errors)
+            {
+                ErrorMessenger?.Errors.Add(identityError.Description);
+            }
+
+            ErrorMessenger?.ShowErrors();
+
+        }
+        else
+        {
+            if (Dialog is not null)
+            {
+                await Dialog.CloseAsync();
+            }
         }
     }
 }

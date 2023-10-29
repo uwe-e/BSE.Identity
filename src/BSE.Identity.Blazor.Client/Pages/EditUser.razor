@@ -108,10 +108,11 @@
             (role, userroles) => new RoleViewModel
                 {
                     Id = role.Id,
-                    Name = role.Name,
+                    Name = role.Name ?? string.Empty,
                     IsSelected = userroles.Where(ur => ur.UserId.Equals(Content.UserId)).Any()
                 }
-        ).OrderBy(r => r.Name)
+        )
+        .OrderBy(r => r.Name)
         .ToList();
     }
 
