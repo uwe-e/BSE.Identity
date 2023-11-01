@@ -45,6 +45,15 @@ body {
         padding-inline-end: 10px;
     }
 
+/*header {
+    position: sticky;
+    top: 0;
+}
+
+footer {
+    position: sticky;
+    bottom: 0;
+}*/
 .main {
     display: grid;
     grid-template-columns: 1fr 3fr;
@@ -92,6 +101,10 @@ body {
     color: var(--neutral-foreground-rest);
     padding-inline-start: calc(var(--design-unit) * 6px);
     padding-inline-end: calc(var(--design-unit) * 6px);
+    
+    
+    flex-grow: 1;
+    overflow-y: auto;
 }
 
 

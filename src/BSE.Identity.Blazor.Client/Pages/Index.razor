@@ -17,7 +17,7 @@
 
 <PageTitle>@Localize["Txt_PageTitle"]</PageTitle>
 
-<NavigationBar/>
+<NavigationBar />
 
 <FluentToolbar Style="width: 100%; border: 1px solid var(--accent-fill-rest)">
     <FluentLabel Typo="@Typography.PageTitle">@Localize["Txt_PageHeader"]</FluentLabel>
@@ -29,31 +29,36 @@
 
 
 <FluentLabel Typo="@Typography.Header" Style="margin-top: 20px">@Localize["Txt_GridHeader"]</FluentLabel>
-@* <FluentProgressRing style="width: 102px; height: 102px;"></FluentProgressRing> *@
-<FluentDataGrid id="manualGrid" Items="@Users" Virtualize="true" ItemSize="40" role="grid" TGridItem="UserRolesViewModel">
-    <PropertyColumn Property="@(u => u.UserName)" Title="@Localize["Grid_Column_UserName"]" Sortable="true" />
-    <PropertyColumn Property="@(u => u.FirstName)" Title="@Localize["Grid_Column_FirstName"]" Sortable="true" />
-    <PropertyColumn Property="@(u => u.LastName)" Title="@Localize["Grid_Column_LastName"]" Sortable="true" />
-    <PropertyColumn Property="@(u => string.Join(", ", u.Roles123.Select(r => r.Name)))" Title="@Localize["Grid_Column_Roles"]" Sortable="true" />
-    <TemplateColumn Title="Actions" Align="@Align.End">
-        <FluentButton Appearance="Appearance.Accent" OnClick="@(() => OnEditUser(context))">
-            <FluentIcon Value="@(new Icons.Regular.Size16.Edit())" Style="fill: var(--foreground-on-accent-rest)" />
-        </FluentButton>
-        <FluentButton Appearance="Appearance.Accent" OnClick="@(() => OnDeleteUser(context))">
-            <FluentIcon Value="@(new Icons.Regular.Size16.Delete())" Style="fill: var(--foreground-on-accent-rest)" />
-        </FluentButton>
-    </TemplateColumn>
-</FluentDataGrid>
+
+<ProgressOverlayPanel Style="height:500px; margin-top: 20px;" Visible="Users is null">
+
+    <FluentDataGrid id="manualGrid" Items="@Users" Virtualize="true" ItemSize="40" role="grid" TGridItem="UserRolesViewModel">
+        <PropertyColumn Property="@(u => u.UserName)" Title="@Localize["Grid_Column_UserName"]" Sortable="true" />
+        <PropertyColumn Property="@(u => u.FirstName)" Title="@Localize["Grid_Column_FirstName"]" Sortable="true" />
+        <PropertyColumn Property="@(u => u.LastName)" Title="@Localize["Grid_Column_LastName"]" Sortable="true" />
+        <PropertyColumn Property="@(u => string.Join(", ", u.Roles123.Select(r => r.Name)))" Title="@Localize["Grid_Column_Roles"]" Sortable="true" />
+        <TemplateColumn Title="Actions" Align="@Align.End">
+            <FluentButton Appearance="Appearance.Accent" OnClick="@(() => OnEditUser(context))">
+                <FluentIcon Value="@(new Icons.Regular.Size16.Edit())" Style="fill: var(--foreground-on-accent-rest)" />
+            </FluentButton>
+            <FluentButton Appearance="Appearance.Accent" OnClick="@(() => OnDeleteUser(context))">
+                <FluentIcon Value="@(new Icons.Regular.Size16.Delete())" Style="fill: var(--foreground-on-accent-rest)" />
+            </FluentButton>
+        </TemplateColumn>
+    </FluentDataGrid>
+
+</ProgressOverlayPanel>
 
 @code {
     IQueryable<UserRolesViewModel>? Users;
-
     bool IsBusy;
 
-    protected override Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
-        Users = GetApplicationUsers();
-        return base.OnInitializedAsync();
+        //IsBusy = true;
+        Users = await GetApplicationUsersAsync();
+        //IsBusy = false;
+        await base.OnInitializedAsync();
     }
 
     async Task OnCreateUser()
@@ -68,7 +73,6 @@
 
     async Task OnEditUser(UserRolesViewModel model)
     {
-
         var dialog = await DialogService.ShowDialogAsync<EditUser>(model, new DialogParameters()
             {
                 OnDialogResult = DialogService.CreateDialogCallback(this, OnUserCreated),
@@ -81,7 +85,10 @@
     {
         if (!result.Cancelled)
         {
-            Users = GetApplicationUsers();
+            //IsBusy = true;
+            Users = null;
+            Users = await GetApplicationUsersAsync();
+            //IsBusy = false;
         }
         await Task.CompletedTask;
     }
@@ -104,10 +111,18 @@
                 var deletionResult = await UserManager.DeleteAsync(userToDelete);
                 if (deletionResult.Succeeded)
                 {
-                    Users = GetApplicationUsers();
+                    //IsBusy = true;
+                    Users = null;
+                    Users = await GetApplicationUsersAsync();
+                    //IsBusy = false;
                 }
             }
         }
+    }
+
+    private async Task<IQueryable<UserRolesViewModel>> GetApplicationUsersAsync()
+    {
+        return await Task.Run(GetApplicationUsers);
     }
 
     private IQueryable<UserRolesViewModel> GetApplicationUsers()
@@ -134,8 +149,8 @@
                         Id = ur.RoleId,
                         IsSelected = true,
                         Name = _context.Roles
-                        .Where(r => r.Id.Equals(ur.RoleId))
-                        .Select(r => r.Name).First()
+                    .Where(r => r.Id.Equals(ur.RoleId))
+                    .Select(r => r.Name).First()
                     }).OrderBy(r => r.Name)
                 }).OrderBy(u => u.Email).ToList<UserRolesViewModel>();
 

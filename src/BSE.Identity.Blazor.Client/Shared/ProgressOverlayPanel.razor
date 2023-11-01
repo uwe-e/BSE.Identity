@@ -1,0 +1,67 @@
+﻿@using Microsoft.AspNetCore.Components
+@using System.ComponentModel;
+
+<div class="overlay-container">
+    @ChildContent
+    <div class="progress-overlay@_hideStyle">
+        <div class="progress-ring">
+            <FluentProgressRing></FluentProgressRing>
+        </div>
+        
+    </div>
+</div>
+
+@code {
+    private bool _isVisible;
+    private string _hideStyle = "";
+
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    [Parameter]
+    public EventCallback<bool> VisibleChanged { get; set; }
+
+    [Parameter]
+    public string? Style { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public bool Visible
+    {
+        get => _isVisible;
+        set
+        {
+            if (_isVisible != value)
+            {
+                _isVisible = value;
+                OnPropertyChanged(nameof(Visible));
+            }
+        }
+    }
+
+    private void OnPropertyChanged(string propertyName)
+    {
+        if (!string.IsNullOrEmpty(propertyName))
+        {
+            switch (propertyName)
+            {
+                case nameof(Visible):
+                    OnVisibilityChange(_isVisible);
+                    break;
+            }
+
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+
+    void OnVisibilityChange(bool isVisible)
+    {
+        _hideStyle = " hide";
+        if (isVisible)
+        {
+            _hideStyle = string.Empty;
+        }
+
+    }
+}
