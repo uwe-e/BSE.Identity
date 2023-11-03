@@ -32,7 +32,7 @@
 
 <ProgressOverlayPanel Style="height:500px; margin-top: 20px;" Visible="Users is null">
 
-    <FluentDataGrid id="manualGrid" Items="@Users" Virtualize="true" ItemSize="40" role="grid" TGridItem="UserRolesViewModel">
+    <FluentDataGrid id="manualGrid" Items="@Users" Virtualize="true" ItemSize="40" role="grid" TGridItem="UserRolesViewModel" GenerateHeader="GenerateHeaderOption.Sticky">
         <PropertyColumn Property="@(u => u.UserName)" Title="@Localize["Grid_Column_UserName"]" Sortable="true" />
         <PropertyColumn Property="@(u => u.FirstName)" Title="@Localize["Grid_Column_FirstName"]" Sortable="true" />
         <PropertyColumn Property="@(u => u.LastName)" Title="@Localize["Grid_Column_LastName"]" Sortable="true" />
@@ -51,13 +51,10 @@
 
 @code {
     IQueryable<UserRolesViewModel>? Users;
-    bool IsBusy;
 
     protected override async Task OnInitializedAsync()
     {
-        //IsBusy = true;
         Users = await GetApplicationUsersAsync();
-        //IsBusy = false;
         await base.OnInitializedAsync();
     }
 
@@ -85,10 +82,8 @@
     {
         if (!result.Cancelled)
         {
-            //IsBusy = true;
             Users = null;
             Users = await GetApplicationUsersAsync();
-            //IsBusy = false;
         }
         await Task.CompletedTask;
     }
@@ -111,10 +106,8 @@
                 var deletionResult = await UserManager.DeleteAsync(userToDelete);
                 if (deletionResult.Succeeded)
                 {
-                    //IsBusy = true;
                     Users = null;
                     Users = await GetApplicationUsersAsync();
-                    //IsBusy = false;
                 }
             }
         }

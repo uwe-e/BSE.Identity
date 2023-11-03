@@ -25,7 +25,8 @@
 
 <FluentLabel Typo="@Typography.Header" Style="margin-top: 20px">@Localize["Txt_GridHeader"]</FluentLabel>
 
-<FluentDataGrid Items="@RolesList" Virtualize="true" ItemSize="40" role="grid" TGridItem="RoleViewModel">
+<ProgressOverlayPanel Style="height:500px; margin-top: 20px;" Visible="Roles is null">
+<FluentDataGrid Items="@Roles" Virtualize="true" ItemSize="40" role="grid" TGridItem="RoleViewModel">
     <PropertyColumn Property="@(u => u.Name)" Title="@Localize["Grid_Column_RoleName"]" Sortable="true" />
     <TemplateColumn Title="Actions" Align="@Align.End">
         <FluentButton Appearance="Appearance.Accent" OnClick="@(() => OnEditRole(context))">
@@ -36,16 +37,16 @@
         </FluentButton> *@
     </TemplateColumn>
 </FluentDataGrid>
+</ProgressOverlayPanel>
 
 @code {
 
-    IQueryable<RoleViewModel>? RolesList;
+    IQueryable<RoleViewModel>? Roles;
 
-    protected override Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
-        RolesList = GetRoles();
-
-        return base.OnInitializedAsync();
+        Roles = await GetRolesAsync();
+        await base.OnInitializedAsync();
     }
 
     async Task OnCreateRole()
@@ -78,9 +79,15 @@
     {
         if (!result.Cancelled)
         {
-            RolesList = GetRoles();
+            Roles = null;
+            Roles = await GetRolesAsync();
         }
         await Task.CompletedTask;
+    }
+
+    private async Task<IQueryable<RoleViewModel>> GetRolesAsync()
+    {
+        return await Task.Run(GetRoles);
     }
 
     private IQueryable<RoleViewModel> GetRoles()
