@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using System.Collections.ObjectModel;
 
-namespace BSE.Identity.Blazor.Client.Pages.Shared
+namespace BSE.Identity.Blazor.Client.Shared
 {
     public class ErrorMessengerBase : ComponentBase
     {
@@ -17,7 +17,7 @@ namespace BSE.Identity.Blazor.Client.Pages.Shared
 
         private void OnErrorCollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-           if (sender is ObservableCollection<string> errors)
+            if (sender is ObservableCollection<string> errors)
             {
                 HasErrors = errors.Count > 0;
             }
