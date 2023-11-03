@@ -28,12 +28,12 @@
 <FluentDataGrid Items="@Roles" Virtualize="true" ItemSize="40" role="grid" TGridItem="RoleViewModel">
     <PropertyColumn Property="@(u => u.Name)" Title="@Localize["Grid_Column_RoleName"]" Sortable="true" />
     <TemplateColumn Title="Actions" Align="@Align.End">
-        <FluentButton Appearance="Appearance.Accent" OnClick="@(() => OnEditRole(context))">
-            <FluentIcon Value="@(new Icons.Regular.Size16.Edit())" Style="fill: var(--foreground-on-accent-rest)" />
+        <FluentButton OnClick="@(() => OnEditRole(context))">
+            <FluentIcon Value="@(new Icons.Regular.Size16.Edit())" />
         </FluentButton>
-        @* <FluentButton Appearance="Appearance.Accent" OnClick="@(() => OnDeleteUser(context))">
-            <FluentIcon Value="@(new Icons.Regular.Size16.Delete())" Style="fill: var(--foreground-on-accent-rest)" />
-        </FluentButton> *@
+        <FluentButton OnClick="@(() => OnDeleteRole(context))">
+                <FluentIcon Value="@(new Icons.Regular.Size16.Delete().WithColor("red"))" />
+        </FluentButton>
     </TemplateColumn>
 </FluentDataGrid>
 </ProgressOverlayPanel>
@@ -66,7 +66,7 @@
         /*
         * If we have an existing model, we date up. If not we create a new one
         */
-        var dialog = await DialogService.ShowDialogAsync<EditRole>(model, new DialogParameters()
+        var dialog = await DialogService.ShowPanelAsync<EditRole>(model, new DialogParameters()
             {
                 OnDialogResult = DialogService.CreateDialogCallback(this, OnRoleCreated),
                 Modal = true,
@@ -82,6 +82,29 @@
             Roles = await GetRolesAsync();
         }
         await Task.CompletedTask;
+    }
+
+    async Task OnDeleteRole(RoleViewModel model)
+    {
+        string dialogResultYes = Localize.GetString("Dlg_Result_Yes");
+        string dialogResultNo = Localize.GetString("Dlg_Result_No");
+        string dialogTitle = Localize.GetString("Dlg_RoleDeletion_Title");
+        string dialogMessage = Localize.GetString("Dlg_RoleDeletion_Message", model.Name);
+        var dialog = await DialogService.ShowConfirmationAsync(dialogMessage, dialogResultYes, dialogResultNo, dialogTitle);
+        var result = await dialog.Result;
+        if (!result.Cancelled)
+        {
+            IdentityRole role = await RoleManager.FindByIdAsync(model.Id);
+            if (role != null)
+            {
+                var identityResult = await RoleManager.DeleteAsync(role);
+                if (identityResult.Succeeded)
+                {
+                    Roles = null;
+                    Roles = await GetRolesAsync();
+                }
+            }
+        }
     }
 
     private async Task<IQueryable<RoleViewModel>> GetRolesAsync()

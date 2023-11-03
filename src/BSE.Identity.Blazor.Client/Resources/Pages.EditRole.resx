@@ -130,6 +130,6 @@
     <value>Create a new role</value>
   </data>
   <data name="Txt_PageHeader_UpdateRole" xml:space="preserve">
-    <value>Update an existing role</value>
+    <value>Rename the role</value>
   </data>
 </root>
