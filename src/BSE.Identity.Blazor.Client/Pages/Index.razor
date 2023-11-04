@@ -1,9 +1,170 @@
 ﻿@page "/"
+@attribute [Authorize(Roles = "Administrator")]
 
-<PageTitle>Index</PageTitle>
+@using BSE.Identity.Blazor.Client.Data;
+@using BSE.Identity.Blazor.Client.Models;
+@using BSE.Identity.Blazor.Client.ViewModels;
+@using Microsoft.Fast.Components.FluentUI
+@using Microsoft.AspNetCore.Identity
 
-<h1>Hello, world!</h1>
+@inject UserManager<ApplicationUser> UserManager
+@inject IStringLocalizer<Index> Localize
+@inject IStringLocalizer<ChangePasswordViewModel> LocalizerChangePassword
+@inject IDialogService DialogService
+@inject NavigationManager Navigation
+@inject ApplicationDbContext _context;
 
-Welcome to your new app.
+<FluentDialogProvider />
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+<PageTitle>@Localize["Txt_PageTitle"]</PageTitle>
+
+<NavigationBar />
+
+<FluentToolbar Style="width: 100%; border: 1px solid var(--accent-fill-rest)">
+    <FluentLabel Typo="@Typography.PageTitle">@Localize["Txt_PageHeader"]</FluentLabel>
+    <FluentButton slot="end" Appearance="Appearance.Accent" OnClick="@OnCreateUser">
+        <FluentIcon Slot="start" Value="@(new Icons.Regular.Size16.PeopleAdd())" Color="Color.Fill" />
+        @Localize["Btn_NewUser"]
+    </FluentButton>
+</FluentToolbar>
+
+
+<FluentLabel Typo="@Typography.Header" Style="margin-top: 20px">@Localize["Txt_GridHeader"]</FluentLabel>
+
+<ProgressOverlayPanel Style="height:500px; margin-top: 20px;" Visible="Users is null">
+
+    <FluentDataGrid id="manualGrid" Items="@Users" Virtualize="true" ItemSize="40" role="grid" TGridItem="UserRolesViewModel" GenerateHeader="GenerateHeaderOption.Sticky">
+        <PropertyColumn Property="@(u => u.UserName)" Title="@Localize["Grid_Column_UserName"]" Sortable="true" />
+        <PropertyColumn Property="@(u => u.FirstName)" Title="@Localize["Grid_Column_FirstName"]" Sortable="true" />
+        <PropertyColumn Property="@(u => u.LastName)" Title="@Localize["Grid_Column_LastName"]" Sortable="true" />
+        <PropertyColumn Property="@(u => string.Join(", ", u.Roles123.Select(r => r.Name)))" Title="@Localize["Grid_Column_Roles"]" Sortable="true" />
+        <TemplateColumn Title="Actions" Align="@Align.End">
+            <FluentButton OnClick="@(() => OnEditUser(context))">
+                <FluentIcon Value="@(new Icons.Regular.Size16.Edit())" />
+            </FluentButton>
+            <FluentButton Title="Test test" OnClick="@(() => OnChangePassword(context))">
+                <FluentIcon Value="@(new Icons.Regular.Size16.Password())"  />
+            </FluentButton>
+            <FluentButton OnClick="@(() => OnDeleteUser(context))">
+                <FluentIcon Value="@(new Icons.Regular.Size16.Delete().WithColor("red"))" />
+            </FluentButton>
+        </TemplateColumn>
+    </FluentDataGrid>
+
+</ProgressOverlayPanel>
+
+@code {
+    IQueryable<UserRolesViewModel>? Users;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Users = await GetApplicationUsersAsync();
+        await base.OnInitializedAsync();
+    }
+
+    async Task OnCreateUser()
+    {
+        var dialog = await DialogService.ShowDialogAsync<CreateUser>(new DialogParameters()
+            {
+                OnDialogResult = DialogService.CreateDialogCallback(this, OnUserCreated),
+                Modal = true,
+                PreventDismissOnOverlayClick = true,
+            });
+    }
+
+    async Task OnEditUser(UserRolesViewModel model)
+    {
+        var dialog = await DialogService.ShowPanelAsync<EditUser>(model, new DialogParameters()
+            {
+                OnDialogResult = DialogService.CreateDialogCallback(this, OnUserCreated),
+                Modal = true,
+                PreventDismissOnOverlayClick = true
+            });
+    }
+
+    async Task OnChangePassword(UserRolesViewModel model)
+    {
+        var dialog = await DialogService.ShowPanelAsync<ChangeUserPassword>(new ChangePasswordViewModel(LocalizerChangePassword)
+            {
+                UserId = model.UserId,
+                UserName = model.UserName,
+                Email = model.Email
+            }, new DialogParameters()
+        {
+                Modal = true,
+                PreventDismissOnOverlayClick = true
+        });
+    }
+
+    async Task OnUserCreated(DialogResult result)
+    {
+        if (!result.Cancelled)
+        {
+            Users = null;
+            Users = await GetApplicationUsersAsync();
+        }
+        await Task.CompletedTask;
+    }
+
+    async Task OnDeleteUser(UserRolesViewModel model)
+    {
+        string dialogResultYes = Localize.GetString("Dlg_Result_Yes");
+        string dialogResultNo = Localize.GetString("Dlg_Result_No");
+        string dialogTitle = Localize.GetString("Dlg_UserDeletion_Title");
+        string dialogMessage = Localize.GetString("Dlg_UserDeletion_Message", model.UserName);
+
+        var dialog = await DialogService.ShowConfirmationAsync(dialogMessage, dialogResultYes, dialogResultNo, dialogTitle);
+        var result = await dialog.Result;
+        if (!result.Cancelled)
+        {
+            var userToDelete = _context.Users.First<ApplicationUser>(u => u.Id == model.UserId);
+            if (userToDelete != null)
+            {
+                var userId = userToDelete.Id;
+                var deletionResult = await UserManager.DeleteAsync(userToDelete);
+                if (deletionResult.Succeeded)
+                {
+                    Users = null;
+                    Users = await GetApplicationUsersAsync();
+                }
+            }
+        }
+    }
+
+    private async Task<IQueryable<UserRolesViewModel>> GetApplicationUsersAsync()
+    {
+        return await Task.Run(GetApplicationUsers);
+    }
+
+    private IQueryable<UserRolesViewModel> GetApplicationUsers()
+    {
+        /*
+        * this is because of that MySQL behaviour
+        * https://mysqlconnector.net/troubleshooting/connection-reuse/
+        *
+        * the original query should be the use of UserManager.GetRolesAsync(user)
+        */
+        var usersWithRoles = UserManager.Users.GroupJoin(
+            _context.UserRoles,
+            user => user.Id,
+            userrole => userrole.UserId,
+            (user, userroles) => new UserRolesViewModel
+                {
+                    UserId = user.Id,
+                    UserName = user.UserName,
+                    Email = user.Email,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Roles123 = userroles.Select(ur => new RoleViewModel
+                    {
+                        Id = ur.RoleId,
+                        IsSelected = true,
+                        Name = _context.Roles
+                    .Where(r => r.Id.Equals(ur.RoleId))
+                    .Select(r => r.Name).First()
+                    }).OrderBy(r => r.Name)
+                }).OrderBy(u => u.Email).ToList<UserRolesViewModel>();
+
+        return usersWithRoles.AsQueryable();
+    }
+}

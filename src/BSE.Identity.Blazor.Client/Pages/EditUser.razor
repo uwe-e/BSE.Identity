@@ -1,0 +1,118 @@
+﻿@using BSE.Identity.Blazor.Client.Data;
+@using BSE.Identity.Blazor.Client.Models;
+@using System.Globalization
+@using BSE.Identity.Blazor.Client.ViewModels;
+@using Microsoft.AspNetCore.Identity;
+
+@inherits EditFormDialogBase;
+
+@implements IDialogContentComponent<UserRolesViewModel>
+
+@inject UserManager<ApplicationUser> UserManager
+@inject RoleManager<IdentityRole> RoleManager;
+@inject IStringLocalizer<EditUser> Localize
+@inject ApplicationDbContext _context;
+@inject ILogger<EditUser> Logger
+
+<EditForm Model="@Content" OnValidSubmit="@HandleValidSubmit">
+    <FluentDialogHeader ShowDismiss="true">
+        <FluentStack VerticalAlignment="VerticalAlignment.Center">
+            <FluentIcon Value="@(new Icons.Regular.Size24.PeopleAdd())" />
+            <FluentLabel Typo="Typography.PaneHeader">
+                @Localize["Txt_PageHeader"]
+            </FluentLabel>
+        </FluentStack>
+
+    </FluentDialogHeader>
+
+    <FluentDialogBody>
+        <FluentStack Orientation="Orientation.Vertical">
+
+            <DataAnnotationsValidator />
+            <FluentValidationSummary />
+            <ErrorMessenger @ref="ErrorMessenger" />
+
+            <FluentTextField @bind-Value=@Content.Email TextFieldType="TextFieldType.Email" Readonly="true" style="width: 100%;">@Localize["Label_EmailAddress"]</FluentTextField>
+
+            <FluentTextField @bind-Value=@Content.FirstName TextFieldType="TextFieldType.Text" style="width: 100%;">@Localize["Label_FirstName"]</FluentTextField>
+
+            <FluentTextField @bind-Value=@Content.LastName TextFieldType="TextFieldType.Text" style="width: 100%;">@Localize["Label_LastName"]</FluentTextField>
+
+            <FluentStack Orientation="Orientation.Vertical">
+                <FluentLabel Typo="Typography.Body">Roles</FluentLabel>
+                @foreach (var role in Roles)
+                {
+                    <FluentCheckbox @bind-Value=role.IsSelected>@role.Name</FluentCheckbox>
+                }
+            </FluentStack>
+
+        </FluentStack>
+    </FluentDialogBody>
+    <FluentDialogFooter>
+        <FluentButton Type="ButtonType.Submit" Appearance="Appearance.Accent">@Localize["Btn_Submit"]</FluentButton>
+        <FluentButton OnClick="@OnCancel">Cancel</FluentButton>
+    </FluentDialogFooter>
+
+</EditForm>
+@code {
+
+    [Parameter]
+    public UserRolesViewModel Content { get; set; } = new UserRolesViewModel();
+
+    IList<RoleViewModel>? Roles;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Roles = GetRoles();
+        await base.OnInitializedAsync();
+    }
+
+    protected override async Task HandleValidSubmit(EditContext editContext)
+    {
+        ErrorMessenger?.Errors.Clear();
+        var user = await UserManager.FindByIdAsync(Content.UserId);
+        user.Email = Content.Email;
+        user.FirstName = Content.FirstName ?? string.Empty;
+        user.LastName = Content.LastName ?? string.Empty;
+
+        await UserManager.UpdateAsync(user);
+        var roles = await UserManager.GetRolesAsync(user);
+        var identityResult = await UserManager.RemoveFromRolesAsync(user, roles);
+        if (!identityResult.Succeeded)
+        {
+            ErrorMessenger?.Errors.Add("Cannot remove user existing roles");
+            ErrorMessenger?.ShowErrors();
+            return;
+        }
+        identityResult = await UserManager.AddToRolesAsync(user, Roles.Where(x => x.IsSelected).Select(y => y.Name));
+        if (!identityResult.Succeeded)
+        {
+            ErrorMessenger?.Errors.Add("Cannot add selected roles to user");
+            ErrorMessenger?.ShowErrors();
+            return;
+        }
+
+        if (Dialog is not null)
+        {
+            await Dialog.CloseAsync();
+        }
+    }
+
+    private IList<RoleViewModel> GetRoles()
+    {
+        return RoleManager.Roles.GroupJoin(
+            _context.UserRoles,
+            role => role.Id,
+            userrole => userrole.RoleId,
+            (role, userroles) => new RoleViewModel
+                {
+                    Id = role.Id,
+                    Name = role.Name ?? string.Empty,
+                    IsSelected = userroles.Where(ur => ur.UserId.Equals(Content.UserId)).Any()
+                }
+        )
+        .OrderBy(r => r.Name)
+        .ToList();
+    }
+
+}

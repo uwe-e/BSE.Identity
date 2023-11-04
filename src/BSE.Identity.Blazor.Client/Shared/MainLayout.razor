@@ -1,20 +1,20 @@
 ﻿@inherits LayoutComponentBase
+@inject IStringLocalizer<MainLayout> Localize
 
 <PageTitle>BSE.Identity.Blazor.Client</PageTitle>
-
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
-
-    <main>
-        <div class="top-row px-4 auth">
-            <LoginDisplay />
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
-        </div>
-
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
-</div>
+<header>
+    <FluentToolbar id="toolbar-fluent-components" style="width:100%">
+        <img src="/bse-logo-57x57.png" alt="My Logo" /><FluentLabel Typo="@Typography.H2">@Localize["Txt_PageHeader"]</FluentLabel>
+        <LoginDisplay />
+    </FluentToolbar>
+</header>
+<main>
+    <article class="content px-4">
+        @Body
+    </article>
+</main>
+<footer>
+    <FluentStack Orientation="Orientation.Horizontal" style="justify-content:end">
+        <FluentLabel Typo="@Typography.Body">@string.Format(Localize["Txt_Footer-Copyright"], DateTime.Now.Year)</FluentLabel>
+    </FluentStack>
+</footer>

@@ -3,6 +3,7 @@ using System;
 using BSE.Identity.Blazor.Client.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BSE.Identity.Blazor.Client.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230923080544_Added Custom Properties Name And First Name")]
+    partial class AddedCustomPropertiesNameAndFirstName
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -89,25 +92,6 @@ namespace BSE.Identity.Blazor.Client.Migrations
                         .HasDatabaseName("UserNameIndex");
 
                     b.ToTable("AspNetUsers", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "3bbd9329-5316-425a-be8c-fa514c50a5b1",
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "30034850-4ff4-4880-8523-172846cb6920",
-                            Email = "admin@bsetunes.com",
-                            EmailConfirmed = true,
-                            FirstName = "",
-                            LastName = "",
-                            LockoutEnabled = false,
-                            NormalizedUserName = "ADMIN@BSETUNES.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAECrXMhh57xgGxk+Zq/ulmdwQRRi2LHnGyY0kIRfsYGN9QTLiuHhEx9RqBOFZwWQQEw==",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "236e9dfc-8e56-420b-ad7b-9aeeb6e00757",
-                            TwoFactorEnabled = false,
-                            UserName = "admin@bsetunes.com"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -134,15 +118,6 @@ namespace BSE.Identity.Blazor.Client.Migrations
                         .HasDatabaseName("RoleNameIndex");
 
                     b.ToTable("AspNetRoles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "332ce434-e26f-4307-97f3-e3d411fecc07",
-                            ConcurrencyStamp = "332ce434-e26f-4307-97f3-e3d411fecc07",
-                            Name = "Administator",
-                            NormalizedName = "ADMINISTRATOR"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -228,13 +203,6 @@ namespace BSE.Identity.Blazor.Client.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUserRoles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            UserId = "3bbd9329-5316-425a-be8c-fa514c50a5b1",
-                            RoleId = "332ce434-e26f-4307-97f3-e3d411fecc07"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>

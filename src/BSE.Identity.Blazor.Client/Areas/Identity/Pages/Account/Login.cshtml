@@ -1,83 +1,58 @@
 ﻿@page
+@using BSE.Identity.Blazor.Client.Pages;
+@using Microsoft.Extensions.Localization;
+@using Microsoft.Fast.Components.FluentUI
+
+@inject IStringLocalizer<LoginModel> Localize
+
 @model LoginModel
 
+
 @{
+    Layout = "_ModalLayout";
     ViewData["Title"] = "Log in";
 }
 
-<h1>@ViewData["Title"]</h1>
-<div class="row">
-    <div class="col-md-4">
-        <section>
-            <form id="account" method="post">
-                <h2>Use a local account to log in.</h2>
-                <hr />
-                <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-                <div class="form-floating mb-3">
-                    <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
-                    <label asp-for="Input.Email" class="form-label">Email</label>
-                    <span asp-validation-for="Input.Email" class="text-danger"></span>
-                </div>
-                <div class="form-floating mb-3">
-                    <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password" />
-                    <label asp-for="Input.Password" class="form-label">Password</label>
-                    <span asp-validation-for="Input.Password" class="text-danger"></span>
-                </div>
-                <div class="checkbox mb-3">
-                    <label asp-for="Input.RememberMe" class="form-label">
-                        <input class="form-check-input" asp-for="Input.RememberMe" />
-                        @Html.DisplayNameFor(m => m.Input.RememberMe)
-                    </label>
-                </div>
+<article class="content">
+
+    <div class="container-fluid">
+        <div class="row justify-content-center align-items-center" style="height: 80vh;">
+            <div class="col-3">
                 <div>
-                    <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
-                </div>
-                <div>
-                    <p>
-                        <a id="forgot-password" asp-page="./ForgotPassword">Forgot your password?</a>
-                    </p>
-                    <p>
-                        <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Register as a new user</a>
-                    </p>
-                    <p>
-                        <a id="resend-confirmation" asp-page="./ResendEmailConfirmation">Resend email confirmation</a>
-                    </p>
-                </div>
-            </form>
-        </section>
-    </div>
-    <div class="col-md-6 col-md-offset-2">
-        <section>
-            <h3>Use another service to log in.</h3>
-            <hr />
-            @{
-                if ((Model.ExternalLogins?.Count ?? 0) == 0)
-                {
-                    <div>
-                        <p>
-                            There are no external authentication services configured. See this <a href="https://go.microsoft.com/fwlink/?LinkID=532715">article
-                            about setting up this ASP.NET application to support logging in via external services</a>.
-                        </p>
+                    <div class="hstack">
+                        <img src="/bse-logo-57x57.png" style="mx-auto;" alt="My Logo">
+                        <h2> @Localize["Txt_PageHeader"]</h2>
                     </div>
-                }
-                else
-                {
-                    <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
-                        <div>
-                            <p>
-                                @foreach (var provider in Model.ExternalLogins!)
-                                {
-                                    <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
-                                }
-                            </p>
+                    
+                    <form id="account" method="post">
+
+                        <p class="fs-4">@Localize["Txt_FormHeader"]</p>
+                        <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+                        <div class="mb-1">
+                            <fluent-text-field name="Input.Email" appearance="outline" class="form-outline w-100" asp-for="Input.Email" placeholder="name@example.com">@Localize["Label_EmailAddress"]</fluent-text-field>
+                            <span asp-validation-for="Input.Email" class="text-danger"></span>
                         </div>
+                        <div class="mb-1">
+                            <fluent-text-field name="Input.Password" appearance="outline" type="password" class="form-outline w-100" asp-for="Input.Password" placeholder="password">Password</fluent-text-field>
+                            <span asp-validation-for="Input.Password" class="text-danger"></span>
+                        </div>
+                        <div class="mb-1">
+                            <fluent-checkbox name="Input.RememberMe">@Html.DisplayNameFor(m => m.Input.RememberMe)</fluent-checkbox>
+
+                        </div>
+                        <div style="text-align: right">
+                            <fluent-button id="login-submit" type="submit" appearance="accent">@Localize["Btn_Submit"]</fluent-button>
+                        </div>
+
                     </form>
-                }
-            }
-        </section>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
+</article>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <!-- fluent ui scripts-->
+    <script type="module" src="~/js/web-components.min.js"></script>
 }

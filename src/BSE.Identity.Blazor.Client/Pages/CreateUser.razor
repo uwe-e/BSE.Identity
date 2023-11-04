@@ -1,0 +1,87 @@
+﻿@implements IDialogContentComponent<CreateUserViewModel>
+
+@using BSE.Identity.Blazor.Client.Models;
+@using System.Globalization
+@using BSE.Identity.Blazor.Client.ViewModels;
+@using Microsoft.AspNetCore.Identity;
+
+@inherits EditFormDialogBase;
+
+@inject UserManager<ApplicationUser> UserManager
+@inject IStringLocalizer<CreateUser> Localize
+
+<EditForm Model="@Content" OnValidSubmit="@HandleValidSubmit">
+    <FluentDialogHeader ShowDismiss="true">
+        <FluentStack VerticalAlignment="VerticalAlignment.Center">
+            <FluentIcon Value="@(new Icons.Regular.Size24.PeopleAdd())" />
+            <FluentLabel Typo="Typography.PaneHeader">
+                @Localize["Txt_PageHeader"]
+            </FluentLabel>
+        </FluentStack>
+
+    </FluentDialogHeader>
+
+    <FluentDialogBody>
+        <FluentStack Orientation="Orientation.Vertical">
+
+            <DataAnnotationsValidator />
+            <FluentValidationSummary />
+            <ErrorMessenger @ref="ErrorMessenger" />
+
+            <FluentTextField @bind-Value=@Content.Email TextFieldType="TextFieldType.Email" Spellcheck="true" style="width: 100%;">@Localize["Label_EmailAddress"]</FluentTextField>
+
+            <FluentTextField @bind-Value=@Content.FirstName TextFieldType="TextFieldType.Text" style="width: 100%;">@Localize["Label_FirstName"]</FluentTextField>
+
+            <FluentTextField @bind-Value=@Content.LastName TextFieldType="TextFieldType.Text" style="width: 100%;">@Localize["Label_LastName"]</FluentTextField>
+
+            <FluentTextField @bind-Value=@Content.Password TextFieldType="TextFieldType.Password" style="width: 100%;">@Localize["Label_Password"]</FluentTextField>
+
+            <FluentTextField @bind-Value=@Content.ConfirmPassword TextFieldType="TextFieldType.Password" style="width: 100%;">@Localize["Label_Confirm_Password"]</FluentTextField>
+
+        </FluentStack>
+    </FluentDialogBody>
+    <FluentDialogFooter>
+        <FluentButton Type="ButtonType.Submit" Appearance="Appearance.Accent">@Localize["Btn_Submit"]</FluentButton>
+        <FluentButton OnClick="@OnCancel">Cancel</FluentButton>
+    </FluentDialogFooter>
+
+</EditForm>
+@code {
+
+    [Parameter]
+    public CreateUserViewModel Content { get; set; } = new CreateUserViewModel();
+
+    protected override async Task HandleValidSubmit(EditContext editContext)
+    {
+        ErrorMessenger?.Errors.Clear();
+
+        ApplicationUser newUser = new ApplicationUser
+            {
+                UserName = Content.Email,
+                Email = Content.Email,
+                FirstName = Content.FirstName ?? string.Empty,
+                LastName = Content.LastName ?? string.Empty
+
+            };
+
+        var identityResult = await UserManager.CreateAsync(newUser, Content.Password);
+        if (!identityResult.Succeeded)
+        {
+            foreach (var identityError in identityResult.Errors)
+            {
+                ErrorMessenger?.Errors.Add(identityError.Description);
+            }
+
+            ErrorMessenger?.ShowErrors();
+
+        }
+        else
+        {
+            if (Dialog is not null)
+            {
+                await Dialog.CloseAsync();
+            }
+
+        }
+    }
+}

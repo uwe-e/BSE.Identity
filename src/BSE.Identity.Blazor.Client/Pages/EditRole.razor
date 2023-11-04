@@ -1,0 +1,98 @@
+﻿@using BSE.Identity.Blazor.Client.ViewModels;
+@using Microsoft.AspNetCore.Identity;
+
+@inherits EditFormDialogBase;
+
+@implements IDialogContentComponent<RoleViewModel>
+
+@inject RoleManager<IdentityRole> RoleManager
+@inject IStringLocalizer<EditRole> Localize
+
+<EditForm Model="@Content" OnValidSubmit="@HandleValidSubmit">
+    <FluentDialogHeader ShowDismiss="true">
+        <FluentStack VerticalAlignment="VerticalAlignment.Center">
+            <FluentIcon Value="@(new Icons.Regular.Size24.FolderPeople())" />
+            <FluentLabel Typo="Typography.PaneHeader">
+                @_pageHeader
+            </FluentLabel>
+        </FluentStack>
+
+    </FluentDialogHeader>
+
+    <FluentDialogBody>
+        <FluentStack Orientation="Orientation.Vertical">
+
+            <DataAnnotationsValidator />
+            <FluentValidationSummary />
+            <ErrorMessenger @ref="ErrorMessenger" />
+
+            <FluentTextField @bind-Value=@Content.Name TextFieldType="TextFieldType.Text" Spellcheck="true" style="width: 100%;">@Localize["Label_RoleName"]</FluentTextField>
+
+        </FluentStack>
+    </FluentDialogBody>
+    <FluentDialogFooter>
+        <FluentButton Type="ButtonType.Submit" Appearance="Appearance.Accent">@Localize["Btn_Submit"]</FluentButton>
+        <FluentButton OnClick="@OnCancel">@Localize["Btn_Cancel"]</FluentButton>
+    </FluentDialogFooter>
+</EditForm>
+
+@code {
+
+    [Parameter]
+    public RoleViewModel Content { get; set; } = new RoleViewModel();
+
+    string? _pageHeader;
+
+    protected override Task OnInitializedAsync()
+    {
+        _pageHeader = Content?.Id == null ? Localize["Txt_PageHeader_NewRole"] : Localize["Txt_PageHeader_UpdateRole"];
+        return base.OnInitializedAsync();
+    }
+
+    protected override async Task HandleValidSubmit(EditContext editContext)
+    {
+        ErrorMessenger?.Errors.Clear();
+
+        IdentityResult identityResult = null;
+        /*
+        * If there's a roleId, the content was created outside of the dialog.
+        * In this case we update an existing role, otherwise we create a new role.
+        */
+        if (Guid.TryParse(Content?.Id, out Guid roleId))
+        {
+            IdentityRole identityRole = await RoleManager.FindByIdAsync(roleId.ToString());
+            if (identityRole is not null)
+            {
+                identityRole.Name = Content.Name;
+                identityResult = await RoleManager.UpdateAsync(identityRole);
+            }
+
+        }
+        else
+        {
+            IdentityRole identityRole = new IdentityRole
+                {
+                    Name = Content?.Name
+                };
+            identityResult = await RoleManager.CreateAsync(identityRole);
+        }
+
+        if (identityResult != null && !identityResult.Succeeded)
+        {
+            foreach (var identityError in identityResult.Errors)
+            {
+                ErrorMessenger?.Errors.Add(identityError.Description);
+            }
+
+            ErrorMessenger?.ShowErrors();
+
+        }
+        else
+        {
+            if (Dialog is not null)
+            {
+                await Dialog.CloseAsync();
+            }
+        }
+    }
+}

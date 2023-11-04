@@ -1,0 +1,77 @@
+﻿@page "/login-tmp"
+@layout ModalLayout
+
+@using BSE.Identity.Blazor.Client.ViewModels;
+@using Microsoft.AspNetCore.Identity
+@using System.Globalization
+@inject NavigationManager Navigation
+@inject SignInManager<IdentityUser> SignInManager
+@* @inject IStringLocalizer<Login-temp> Localize *@
+
+@attribute [AllowAnonymous]
+
+<FluentGrid Style="display: flex; align-items: center; height: 80vh">
+
+    <FluentGridItem xs="12">
+        <FluentGrid Justify="@justification">
+            <FluentGridItem xs="4">
+                <FluentStack Orientation="Orientation.Vertical">
+
+                    <FluentStack VerticalAlignment="@VerticalAlignment.Center">
+                        <img src="/bse-logo-57x57.png" alt="My Logo" /><FluentLabel Typo="@Typography.H2">@* @Localize["Txt_PageHeader"] *@</FluentLabel>
+                    </FluentStack>
+                    <FluentLabel Typo="@Typography.H3">@* @Localize["Txt_FormHeader"] *@</FluentLabel>
+                    <EditForm Model="@input" OnValidSubmit="@FormSubmitted">
+
+                        <DataAnnotationsValidator />
+                        <FluentValidationSummary />
+                        <ErrorMessenger @ref="errorMessenger" />
+
+                        <FluentTextField @bind-Value=@input.Email TextFieldType="TextFieldType.Email" Spellcheck="true" style="width: 100%;">@* @Localize["Label_EmailAddress"] *@</FluentTextField>
+                        <FluentTextField @bind-Value=@input.Password TextFieldType="TextFieldType.Password" style="width: 100%;">@* @Localize["Label_Password"] *@</FluentTextField>
+                        <div style="text-align: right">
+                            <FluentButton Type="ButtonType.Submit" Appearance="Appearance.Accent">@* @Localize["Btn_Submit"] *@</FluentButton>
+                        </div>
+
+                    </EditForm>
+                </FluentStack>
+            </FluentGridItem>
+        </FluentGrid>
+    </FluentGridItem>
+
+</FluentGrid>
+
+@code {
+
+    JustifyContent justification = JustifyContent.Center;
+    ErrorMessenger errorMessenger;
+    LoginViewModel input { get; set; } = new LoginViewModel();
+
+    async Task FormSubmitted(EditContext editContext)
+    {
+
+        errorMessenger.Errors.Clear();
+        try
+        {
+
+
+            //var result = await SignInManager.PasswordSignInAsync(input.Email, input.Password, input.RememberMe, lockoutOnFailure: false).ConfigureAwait(true);
+            var result = await SignInManager.PasswordSignInAsync("ueichkorn@arcor.de", "0b75fE6d-", false, lockoutOnFailure: false);
+            if (result.Succeeded)
+            {
+                Navigation.NavigateTo("/");
+            }
+            else
+            {
+                errorMessenger.Errors.Add("Invalid login attempt.");
+                errorMessenger.ShowErrors();
+            }
+        }
+        catch(Exception ex)
+        {
+            errorMessenger.Errors.Add(ex.Message);
+            errorMessenger.ShowErrors();
+        }
+    }
+
+}

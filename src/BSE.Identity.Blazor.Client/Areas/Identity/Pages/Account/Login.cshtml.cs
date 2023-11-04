@@ -14,18 +14,25 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using BSE.Identity.Blazor.Client.Models;
+using Microsoft.Extensions.Localization;
 
 namespace BSE.Identity.Blazor.Client.Areas.Identity.Pages.Account
 {
     public class LoginModel : PageModel
     {
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ILogger<LoginModel> _logger;
+        private readonly IStringLocalizer _stringLocalizer;
 
-        public LoginModel(SignInManager<IdentityUser> signInManager, ILogger<LoginModel> logger)
+        public LoginModel(
+            SignInManager<ApplicationUser> signInManager,
+            ILogger<LoginModel> logger,
+            IStringLocalizer<LoginModel> stringLocalizer)
         {
             _signInManager = signInManager;
             _logger = logger;
+            _stringLocalizer = stringLocalizer;
         }
 
         /// <summary>
@@ -128,7 +135,7 @@ namespace BSE.Identity.Blazor.Client.Areas.Identity.Pages.Account
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                    ModelState.AddModelError(string.Empty, _stringLocalizer["Msg_Invalid_Login"]);
                     return Page();
                 }
             }

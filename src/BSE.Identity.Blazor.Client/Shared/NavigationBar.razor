@@ -1,0 +1,43 @@
+﻿@inject NavigationManager Navigation
+@inject IStringLocalizer<NavigationBar> Localize
+
+<FluentToolbar Style="width: 100%">
+    <FluentButton slot="start" OnClick="@OnNavigateToUserManagement" Disabled="_disabled == NavBarViewState.None">
+        <FluentIcon Slot="start" Value="@(new Icons.Regular.Size16.PeopleList())" Color="Color.Accent" />
+        @Localize["Btn_UserManagement"]
+    </FluentButton>
+    <FluentButton OnClick="@OnNavigateToRoleManagement" Disabled="_disabled == NavBarViewState.Roles">
+        <FluentIcon Slot="start" Value="@(new Icons.Regular.Size16.FolderPerson())" Color="Color.Accent" />
+        @Localize["Btn_RoleManagement"]
+    </FluentButton>
+</FluentToolbar>
+
+@code {
+    NavBarViewState _disabled;
+
+    void OnNavigateToUserManagement()
+    {
+        Navigation.NavigateTo("/");
+    }
+
+    void OnNavigateToRoleManagement()
+    {
+        Navigation.NavigateTo("/roles");
+    }
+
+    protected override Task OnInitializedAsync()
+    {
+        var route = Navigation.ToBaseRelativePath(Navigation.Uri);
+        Enum.TryParse<NavBarViewState>(route?.ToUpperFirstChar(), out _disabled);
+
+        return base.OnInitializedAsync();
+    }
+
+    enum NavBarViewState
+    {
+        None,
+        Roles
+    }
+}
+
+

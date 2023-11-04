@@ -1,12 +1,34 @@
-﻿<AuthorizeView>
+﻿@inject IStringLocalizer<LoginDisplay> Localize
+
+
+<AuthorizeView>
     <Authorized>
-        <a href="Identity/Account/Manage">Hello, @context.User.Identity?.Name!</a>
-        <form method="post" action="Identity/Account/Logout">
-            <button type="submit" class="nav-link btn btn-link">Log out</button>
-        </form>
+        <div slot="end">
+            <FluentButton id="btnOpen1" Appearance="Appearance.Stealth" slot="end" @onclick="@(() => open = !open)">
+                @context.User.Identity?.Name
+                <FluentIcon Slot="end" Value="@(open ? ChevronUp : ChevronDown)" Color="Color.Neutral" />
+            </FluentButton>
+
+            <FluentMenu Anchor="btnOpen1" @bind-Open="open">
+
+                <FluentMenuItem>
+                    <div slot="end">
+                        <form method="post" id="frmLogout" action="Identity/Account/Logout">
+                            <FluentButton Type="ButtonType.Submit" Appearance="Appearance.Accent">@Localize["Btn_Submit"]</FluentButton>
+                        </form>
+                    </div>
+                </FluentMenuItem>
+
+            </FluentMenu>
+        </div>
     </Authorized>
-    <NotAuthorized>
-        <a href="Identity/Account/Register">Register</a>
-        <a href="Identity/Account/Login">Log in</a>
-    </NotAuthorized>
 </AuthorizeView>
+
+@code {
+    bool open = false;
+    Icon chevronUp;
+    Icon chevronDown;
+
+    Icon ChevronDown => chevronDown ?? (chevronDown = new Icons.Regular.Size16.ChevronDown());
+    Icon ChevronUp => chevronUp ?? (chevronUp = new Icons.Regular.Size16.ChevronUp());
+}

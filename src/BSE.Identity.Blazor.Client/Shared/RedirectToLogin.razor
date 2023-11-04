@@ -1,0 +1,22 @@
+﻿@inject NavigationManager NavigationManager
+
+@code {
+    protected override void OnInitialized()
+    {
+        try
+        {
+            NavigationManager.NavigateTo("Identity/Account/Login", true);
+        }
+        catch(Exception)
+        {
+            /*
+             * Workaround:
+             * Microsoft.AspNetCore.Components.NavigationException
+             * HResult=0x80131500
+             * Message=Exception_WasThrown
+             * Source=Microsoft.AspNetCore.Components.Server
+             *
+             */
+        }
+    }
+}
