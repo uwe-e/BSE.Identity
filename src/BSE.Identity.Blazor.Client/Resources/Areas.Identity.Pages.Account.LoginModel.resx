@@ -126,6 +126,9 @@
   <data name="Label_Password" xml:space="preserve">
     <value>Password</value>
   </data>
+  <data name="Msg_Invalid_Login" xml:space="preserve">
+    <value>You are not authorized to log in. Either you do not have a valid login or you are not an administrator.</value>
+  </data>
   <data name="Txt_FormHeader" xml:space="preserve">
     <value>Sign in</value>
   </data>

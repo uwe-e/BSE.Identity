@@ -1,4 +1,6 @@
 ﻿@page "/"
+@attribute [Authorize(Roles = "Administrator")]
+
 @using BSE.Identity.Blazor.Client.Data;
 @using BSE.Identity.Blazor.Client.Models;
 @using BSE.Identity.Blazor.Client.ViewModels;
@@ -7,6 +9,7 @@
 
 @inject UserManager<ApplicationUser> UserManager
 @inject IStringLocalizer<Index> Localize
+@inject IStringLocalizer<ChangePasswordViewModel> LocalizerChangePassword
 @inject IDialogService DialogService
 @inject NavigationManager Navigation
 @inject ApplicationDbContext _context;
@@ -81,7 +84,7 @@
 
     async Task OnChangePassword(UserRolesViewModel model)
     {
-        var dialog = await DialogService.ShowPanelAsync<ChangeUserPassword>(new ChangePasswordViewModel
+        var dialog = await DialogService.ShowPanelAsync<ChangeUserPassword>(new ChangePasswordViewModel(LocalizerChangePassword)
             {
                 UserId = model.UserId,
                 UserName = model.UserName,

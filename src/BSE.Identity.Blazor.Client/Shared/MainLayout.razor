@@ -14,5 +14,7 @@
     </article>
 </main>
 <footer>
-    <div style="width:100%"><FluentLabel slot="end" Typo="@Typography.Body">@string.Format(Localize["Txt_Footer-Copyright"], DateTime.Now.Year)</FluentLabel></div>
+    <FluentStack Orientation="Orientation.Horizontal" style="justify-content:end">
+        <FluentLabel Typo="@Typography.Body">@string.Format(Localize["Txt_Footer-Copyright"], DateTime.Now.Year)</FluentLabel>
+    </FluentStack>
 </footer>
