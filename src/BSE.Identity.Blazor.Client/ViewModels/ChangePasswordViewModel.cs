@@ -1,5 +1,4 @@
-﻿using Elfie.Serialization;
-using Microsoft.Extensions.Localization;
+﻿using Microsoft.Extensions.Localization;
 using System.ComponentModel.DataAnnotations;
 
 namespace BSE.Identity.Blazor.Client.ViewModels

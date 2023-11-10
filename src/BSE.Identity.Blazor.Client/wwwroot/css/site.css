@@ -107,7 +107,13 @@ footer {
     overflow-y: auto;
 }
 
-
+.validation-message {
+    color: #ff0000;
+}
+/* corrects an type within fluent */
+.validation-mesage {
+    color: #ff0000;
+}
 #blazor-error-ui {
     background: lightyellow;
     bottom: 0;

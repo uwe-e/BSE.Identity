@@ -26,9 +26,9 @@
 
 @code {
     bool open = false;
-    Icon chevronUp;
-    Icon chevronDown;
+    Icon _chevronUp;
+    Icon _chevronDown;
 
-    Icon ChevronDown => chevronDown ?? (chevronDown = new Icons.Regular.Size16.ChevronDown());
-    Icon ChevronUp => chevronUp ?? (chevronUp = new Icons.Regular.Size16.ChevronUp());
+    Icon ChevronDown => _chevronDown ?? (_chevronDown = new Icons.Regular.Size16.ChevronDown());
+    Icon ChevronUp => _chevronUp ?? (_chevronUp = new Icons.Regular.Size16.ChevronUp());
 }

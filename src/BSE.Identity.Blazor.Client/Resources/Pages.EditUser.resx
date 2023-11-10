@@ -139,7 +139,7 @@
     <value>User Name</value>
   </data>
   <data name="Txt_PageHeader" xml:space="preserve">
-    <value>Create a new user</value>
+    <value>Changes a user's data</value>
   </data>
   <data name="Txt_PageTitle" xml:space="preserve">
     <value>Users</value>

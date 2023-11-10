@@ -80,14 +80,14 @@
         var identityResult = await UserManager.RemoveFromRolesAsync(user, roles);
         if (!identityResult.Succeeded)
         {
-            ErrorMessenger?.Errors.Add("Cannot remove user existing roles");
+            ErrorMessenger?.Errors.Add("Before we can add the selected roles, we remove the existing roles. That fails");
             ErrorMessenger?.ShowErrors();
             return;
         }
         identityResult = await UserManager.AddToRolesAsync(user, Roles.Where(x => x.IsSelected).Select(y => y.Name));
         if (!identityResult.Succeeded)
         {
-            ErrorMessenger?.Errors.Add("Cannot add selected roles to user");
+            ErrorMessenger?.Errors.Add("We cannot add the selected roles to user");
             ErrorMessenger?.ShowErrors();
             return;
         }
