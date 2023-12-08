@@ -6,6 +6,20 @@ Blazor Server implementation with [Fluent UI Blazor components](https://www.flue
 
 ## MySQL
 
+## Precondition
+
+you need a mysql server. Tested versions of the [community edition](https://dev.mysql.com/downloads/mysql/) are:
+- 5.7.33
+- 8.0.34
+
+The used **Pomelo.EntityFrameworkCore.MySql** database provider needs the used database version.
+
+```
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseMySql(connectionStringBuilder.ConnectionString, new MySqlServerVersion(new Version(8, 0, 34)))
+);
+```
+
 ### Necessary user privileges
 
 For database creation, we need the following provileges
@@ -25,14 +39,19 @@ Open the Package Manager Console
 
 and type **update-database** in.
 
-![update-database](/docs/images/update-database.png)
+```
+PM> update-database
+```
 
 ### User Secrets
 
 open a console navigate into the project directory and type 
 
 ```
-dotnet user-secrets set ConnectionStrings:DefaultConnection "Server=localhost;Database=users123....."
+dotnet user-secrets set mysql:server "yourdatabaseserver"
+dotnet user-secrets set mysql:database "yourdatabase"
+dotnet user-secrets set mysql:userid "userid"
+dotnet user-secrets set mysql:password "password"
 ```
 
 ## Restrictions

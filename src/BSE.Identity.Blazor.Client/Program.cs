@@ -1,3 +1,4 @@
+using Azure.Identity;
 using BSE.Identity.Blazor.Client.Areas.Identity;
 using BSE.Identity.Blazor.Client.Data;
 using BSE.Identity.Blazor.Client.Models;
@@ -5,22 +6,50 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Fast.Components.FluentUI;
+using MySqlConnector;
+using System.Security.Cryptography.X509Certificates;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+if (builder.Environment.IsProduction())
+{
+    using var x509Store = new X509Store(StoreLocation.CurrentUser);
+    x509Store.Open(OpenFlags.ReadOnly);
+    var x509Certificate = x509Store.Certificates
+    .Find(
+        X509FindType.FindByThumbprint,
+        builder.Configuration["KeyVault:AzureADCertThumbprint"],
+        validOnly: false)
+    .OfType<X509Certificate2>()
+    .Single();
+
+    builder.Configuration.AddAzureKeyVault(
+            new Uri($"https://{builder.Configuration["KeyVault:Name"]}.vault.azure.net/"),
+            new ClientCertificateCredential(
+                builder.Configuration["KeyVault:AzureADDirectoryId"],
+                builder.Configuration["KeyVault:AzureADApplicationId"],
+                x509Certificate));
+}
+
+var connectionStringBuilder = new MySqlConnectionStringBuilder
+{
+    Server = builder.Configuration["mysql:server"],
+    Database = builder.Configuration["mysql:database"],
+    UserID = builder.Configuration["mysql:userid"],
+    Password = builder.Configuration["mysql:password"]
+};
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 34)))
+    options.UseMySql(connectionStringBuilder.ConnectionString, new MySqlServerVersion(new Version(8, 0, 34)))
     );
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
-{
-    options.SignIn.RequireConfirmedAccount = true;
-    options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequireLowercase = false;
-    options.Password.RequireUppercase = false;
-})
+    {
+        options.SignIn.RequireConfirmedAccount = true;
+        options.Password.RequireNonAlphanumeric = false;
+        options.Password.RequireLowercase = false;
+        options.Password.RequireUppercase = false;
+    })
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddRazorPages();
