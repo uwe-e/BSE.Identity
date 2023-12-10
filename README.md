@@ -59,8 +59,6 @@ dotnet user-secrets set mysql:password "password"
 ### Localization
 The [Data annotations localization](https://github.com/dotnet/aspnetcore/issues/12158) isn't supported in Blazor Server.
 
-### Fluent UI Components
-Using of <FluentCheckbox/> on Fluent Dialogs and Panels is a bit wonky
 
 ## Azure Keyvault
 
