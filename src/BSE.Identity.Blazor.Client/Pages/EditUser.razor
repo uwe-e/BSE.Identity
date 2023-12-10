@@ -32,7 +32,7 @@
             <FluentValidationSummary />
             <ErrorMessenger @ref="ErrorMessenger" />
 
-            <FluentTextField @bind-Value=@Content.Email TextFieldType="TextFieldType.Email" Readonly="true" style="width: 100%;">@Localize["Label_EmailAddress"]</FluentTextField>
+            <FluentTextField @bind-Value=@Content.Email TextFieldType="TextFieldType.Email" Disabled="true" style="width: 100%;">@Localize["Label_EmailAddress"]</FluentTextField>
 
             <FluentTextField @bind-Value=@Content.FirstName TextFieldType="TextFieldType.Text" style="width: 100%;">@Localize["Label_FirstName"]</FluentTextField>
 
