@@ -62,6 +62,48 @@ The [Data annotations localization](https://github.com/dotnet/aspnetcore/issues/
 ### Fluent UI Components
 Using of <FluentCheckbox/> on Fluent Dialogs and Panels is a bit wonky
 
+## Azure Keyvault
+
+[Azure Key Vault configuration provider in ASP.NET Core](https://learn.microsoft.com/en-us/aspnet/core/security/key-vault-configuration?view=aspnetcore-7.0#use-application-id-and-x509-certificate-for-non-azure-hosted-apps)
+
+### New-SelfSignedCertificate
+Use Powershell to create a self-signed certificate,
+
+```
+$cert = New-SelfSignedCertificate -DnsName "identity.bsetunes.com" -CertStoreLocation "Cert:\CurrentUser\My"
+```
+set a password,
+```
+$pwd = ConvertTo-SecureString -String "passwordfrompwmanager" -Force -AsPlainText
+```
+and export the certifiate for later use
+```
+Export-PfxCertificate -Cert $cert -FilePath "C:\Certificates\localmachine\identity-bsetunes-com.pfx" -Password $pwd
+```
+
+Open the management console mmc.exe, select the certificate snap-in for the local computer, find the certificate you just created, 
+
+- open the properties and remember the fingerprint.
 
 
+![mmc.exe](/docs/images/self-signed-certificate-thumbprint.png)
 
+- export the PKCS#12 archive (.pfx) certificate as a DER-encoded certificate (.cer).
+
+![mmc.exe](/docs/images/self-signed-certificate-export.png)
+
+### Azure Portal
+
+- upload the created cer certificate to the appropriate app registristration in Azure
+
+![Azure App Registration](/docs/images/azure-app-reg-upload-cer-cerificate.png)
+
+- import the previously exported pfx certificate into the keyvault.
+
+![Azure Keyvault](/docs/images/azure-keyvault-import-pfx-certficate.png)
+
+- configure the access policy for the previosly created app registration in the keyvault.
+
+![Azure Keyvault Access Policy](/docs/images/azure-keyvault-configure-access-policy.png)
+
+![Azure Keyvault Access Principal](/docs/images/azure-keyvault-configure-access-policy-principal.png)
