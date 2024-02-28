@@ -35,13 +35,7 @@ and the custom privilege
 
 ### Database creation
 
-Open the Package Manager Console
-
-and type **update-database** in.
-
-```
-PM> update-database
-```
+If the database is not available, it will be created on first startup
 
 ### User Secrets
 

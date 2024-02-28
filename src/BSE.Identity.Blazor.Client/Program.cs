@@ -1,6 +1,7 @@
 using Azure.Identity;
 using BSE.Identity.Blazor.Client.Areas.Identity;
 using BSE.Identity.Blazor.Client.Data;
+using BSE.Identity.Blazor.Client.Extensions;
 using BSE.Identity.Blazor.Client.Models;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -84,6 +85,8 @@ else
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
+app.MigrateDatabase();
 
 app.UseHttpsRedirection();
 
