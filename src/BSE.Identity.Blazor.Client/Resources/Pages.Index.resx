@@ -132,6 +132,18 @@
   <data name="Dlg_UserDeletion_Title" xml:space="preserve">
     <value>User Account Deletion</value>
   </data>
+  <data name="Grid_Column_Actions" xml:space="preserve">
+    <value>Actions</value>
+  </data>
+  <data name="Grid_Column_Actions_ChangePassword" xml:space="preserve">
+    <value>Change Password</value>
+  </data>
+  <data name="Grid_Column_Actions_EditUserData" xml:space="preserve">
+    <value>Edit User Data</value>
+  </data>
+  <data name="Grid_Column_Actions_RemoveUser" xml:space="preserve">
+    <value>Remove User</value>
+  </data>
   <data name="Grid_Column_FirstName" xml:space="preserve">
     <value>First name</value>
   </data>

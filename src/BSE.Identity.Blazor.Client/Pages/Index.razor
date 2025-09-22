@@ -38,14 +38,14 @@
         <PropertyColumn Property="@(u => u.FirstName)" Title="@Localize["Grid_Column_FirstName"]" Sortable="true" />
         <PropertyColumn Property="@(u => u.LastName)" Title="@Localize["Grid_Column_LastName"]" Sortable="true" />
         <PropertyColumn Property="@(u => string.Join(", ", u.Roles123.Select(r => r.Name)))" Title="@Localize["Grid_Column_Roles"]" Sortable="true" />
-        <TemplateColumn Title="Actions" Align="@Align.End">
-            <FluentButton OnClick="@(() => OnEditUser(context))">
+        <TemplateColumn Title="@Localize["Grid_Column_Actions"]" Align="@Align.End">
+            <FluentButton Title="@Localize["Grid_Column_Actions_EditUserData"]" OnClick="@(() => OnEditUser(context))">
                 <FluentIcon Value="@(new Icons.Regular.Size16.Edit())" />
             </FluentButton>
-            <FluentButton Title="Test test" OnClick="@(() => OnChangePassword(context))">
+            <FluentButton Title="@Localize["Grid_Column_Actions_ChangePassword"]" OnClick="@(() => OnChangePassword(context))">
                 <FluentIcon Value="@(new Icons.Regular.Size16.Password())"  />
             </FluentButton>
-            <FluentButton OnClick="@(() => OnDeleteUser(context))">
+            <FluentButton Title="@Localize["Grid_Column_Actions_RemoveUser"]" OnClick="@(() => OnDeleteUser(context))">
                 <FluentIcon Value="@(new Icons.Regular.Size16.Delete().WithColor("red"))" />
             </FluentButton>
         </TemplateColumn>
