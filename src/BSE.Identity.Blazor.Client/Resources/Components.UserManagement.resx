@@ -117,13 +117,46 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Txt_TabTitle_UserManagement" xml:space="preserve">
-    <value>User Management</value>
+  <data name="Btn_NewUser" xml:space="preserve">
+    <value>New User </value>
   </data>
-  <data name="Txt_PageTitle" xml:space="preserve">
-    <value>User Management</value>
+  <data name="Dlg_Result_No" xml:space="preserve">
+    <value>No</value>
   </data>
-  <data name="Txt_TabTitle_RoleManagement" xml:space="preserve">
-    <value>Role Management</value>
+  <data name="Dlg_Result_Yes" xml:space="preserve">
+    <value>Yes</value>
+  </data>
+  <data name="Dlg_UserDeletion_Message" xml:space="preserve">
+    <value>Do you want to delete the user '{0}'</value>
+  </data>
+  <data name="Dlg_UserDeletion_Title" xml:space="preserve">
+    <value>User Account Deletion</value>
+  </data>
+  <data name="Grid_Column_Actions" xml:space="preserve">
+    <value>Actions</value>
+  </data>
+  <data name="Grid_Column_Actions_ChangePassword" xml:space="preserve">
+    <value>Change Password</value>
+  </data>
+  <data name="Grid_Column_Actions_EditUserData" xml:space="preserve">
+    <value>Edit User Data</value>
+  </data>
+  <data name="Grid_Column_Actions_RemoveUser" xml:space="preserve">
+    <value>Remove User</value>
+  </data>
+  <data name="Grid_Column_FirstName" xml:space="preserve">
+    <value>First Name</value>
+  </data>
+  <data name="Grid_Column_LastName" xml:space="preserve">
+    <value>Last Name</value>
+  </data>
+  <data name="Grid_Column_Roles" xml:space="preserve">
+    <value>Roles</value>
+  </data>
+  <data name="Grid_Column_UserName" xml:space="preserve">
+    <value>User Name</value>
+  </data>
+  <data name="Txt_GridHeader" xml:space="preserve">
+    <value>User Accounts</value>
   </data>
 </root>

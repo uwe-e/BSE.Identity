@@ -3,6 +3,7 @@ using BSE.Identity.Blazor.Client.Areas.Identity;
 using BSE.Identity.Blazor.Client.Data;
 using BSE.Identity.Blazor.Client.Extensions;
 using BSE.Identity.Blazor.Client.Models;
+using BSE.Identity.Blazor.Client.Services;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -40,7 +41,7 @@ var connectionStringBuilder = new MySqlConnectionStringBuilder
     Password = builder.Configuration["mysql:password"]
 };
 
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
+builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
     options.UseMySql(connectionStringBuilder.ConnectionString, new MySqlServerVersion(new Version(8, 0, 43)))
     );
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
@@ -56,6 +57,8 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<ApplicationUser>>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IRoleService, RoleService>();
 
 // Configure AddFluentUIComponents() service collection extension
 builder.Services.AddHttpClient();

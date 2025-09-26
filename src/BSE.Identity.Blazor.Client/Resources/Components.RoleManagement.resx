@@ -140,10 +140,4 @@ If you delete the role, users who are role members lose that role</value>
   <data name="Txt_GridHeader" xml:space="preserve">
     <value>Roles</value>
   </data>
-  <data name="Txt_PageHeader" xml:space="preserve">
-    <value>Role Management</value>
-  </data>
-  <data name="Txt_PageTitle" xml:space="preserve">
-    <value>Role Management</value>
-  </data>
 </root>
