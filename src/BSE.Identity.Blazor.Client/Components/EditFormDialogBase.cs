@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.Fast.Components.FluentUI;
 
-namespace BSE.Identity.Blazor.Client.Pages
+namespace BSE.Identity.Blazor.Client.Components
 {
     public class EditFormDialogBase : ComponentBase
     {

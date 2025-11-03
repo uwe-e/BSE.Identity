@@ -1,29 +1,18 @@
-﻿@page "/roles"
-@attribute [Authorize(Roles = "Administrator")]
-
+﻿@using BSE.Identity.Blazor.Client.Services
 @using BSE.Identity.Blazor.Client.ViewModels;
 @using Microsoft.AspNetCore.Identity
 
-@inject RoleManager<IdentityRole> RoleManager
+@inject IRoleService RoleService
 @inject IStringLocalizer<RoleManagement> Localize
 @inject IDialogService DialogService
-@inject NavigationManager Navigation
 
-<FluentDialogProvider />
-
-<PageTitle>@Localize["Txt_PageTitle"]</PageTitle>
-
-<NavigationBar/>
-
-<FluentToolbar Style="width: 100%; border: 1px solid var(--accent-fill-rest)">
-    <FluentLabel Typo="@Typography.PageTitle">@Localize["Txt_PageHeader"]</FluentLabel>
+<FluentToolbar Style="margin-top: 20px; width: 100%; border: 0px solid var(--accent-fill-rest)">
+    <FluentLabel Typo="@Typography.Header">@Localize["Txt_GridHeader"]</FluentLabel>
     <FluentButton slot="end" Appearance="Appearance.Accent" OnClick="@OnCreateRole">
         <FluentIcon Slot="start" Value="@(new Icons.Regular.Size16.FolderPerson())" Color="Color.Fill" />
         @Localize["Btn_NewRole"]
     </FluentButton>
 </FluentToolbar>
-
-<FluentLabel Typo="@Typography.Header" Style="margin-top: 20px">@Localize["Txt_GridHeader"]</FluentLabel>
 
 <ProgressOverlayPanel Style="height:500px; margin-top: 20px;" Visible="Roles is null">
 <FluentDataGrid Items="@Roles" Virtualize="true" ItemSize="40" role="grid" TGridItem="RoleViewModel">
@@ -45,7 +34,10 @@
 
     protected override async Task OnInitializedAsync()
     {
-        Roles = await GetRolesAsync();
+        if (Roles is null)
+        {
+            Roles = await RoleService.GetRolesAsync();
+        }
         await base.OnInitializedAsync();
     }
 
@@ -54,12 +46,13 @@
         /*
         * If we have an existing model, we date up. If not we create a new one
         */
-        var dialog = await DialogService.ShowDialogAsync<EditRole>(new DialogParameters()
-            {
-                OnDialogResult = DialogService.CreateDialogCallback(this, OnRoleCreated),
-                Modal = true,
-                PreventDismissOnOverlayClick = true
-            });
+
+        await DialogService.ShowDialogAsync<EditRole>(new DialogParameters()
+        {
+            OnDialogResult = DialogService.CreateDialogCallback(this, OnRoleCreated),
+            Modal = true,
+            PreventDismissOnOverlayClick = true
+        });
     }
 
     async Task OnEditRole(RoleViewModel model)
@@ -67,12 +60,12 @@
         /*
         * If we have an existing model, we date up. If not we create a new one
         */
-        var dialog = await DialogService.ShowPanelAsync<EditRole>(model, new DialogParameters()
-            {
-                OnDialogResult = DialogService.CreateDialogCallback(this, OnRoleCreated),
-                Modal = true,
-                PreventDismissOnOverlayClick = true
-            });
+        await DialogService.ShowPanelAsync<EditRole>(model, new DialogParameters()
+        {
+            OnDialogResult = DialogService.CreateDialogCallback(this, OnRoleCreated),
+            Modal = true,
+            PreventDismissOnOverlayClick = true
+        });
     }
 
     async Task OnRoleCreated(DialogResult result)
@@ -80,7 +73,7 @@
         if (!result.Cancelled)
         {
             Roles = null;
-            Roles = await GetRolesAsync();
+            Roles = await RoleService.GetRolesAsync();
         }
         await Task.CompletedTask;
     }
@@ -95,33 +88,12 @@
         var result = await dialog.Result;
         if (!result.Cancelled)
         {
-            IdentityRole role = await RoleManager.FindByIdAsync(model.Id);
-            if (role != null)
+            var identityResult = await RoleService.DeleteRoleAsync(model.Id);
+            if (identityResult.Succeeded)
             {
-                var identityResult = await RoleManager.DeleteAsync(role);
-                if (identityResult.Succeeded)
-                {
-                    Roles = null;
-                    Roles = await GetRolesAsync();
-                }
+                Roles = null;
+                Roles = await RoleService.GetRolesAsync();
             }
         }
     }
-
-    private async Task<IQueryable<RoleViewModel>> GetRolesAsync()
-    {
-        return await Task.Run(GetRoles);
-    }
-
-    private IQueryable<RoleViewModel> GetRoles()
-    {
-        var roles = RoleManager.Roles.Select(role => new RoleViewModel
-            {
-                Id = role.Id,
-                Name = role.Name ?? string.Empty
-            }).OrderBy(r => r.Name)
-            .ToList();
-        return roles.AsQueryable();
-    }
-
 }
