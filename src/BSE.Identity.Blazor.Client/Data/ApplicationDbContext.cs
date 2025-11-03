@@ -10,5 +10,7 @@ namespace BSE.Identity.Blazor.Client.Data
             : base(options)
         {
         }
+
+        public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
     }
 }
