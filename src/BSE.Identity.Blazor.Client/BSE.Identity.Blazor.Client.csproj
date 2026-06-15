@@ -30,11 +30,8 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Fast.Components.FluentUI" Version="3.8.0" />
-    <PackageReference Include="Microsoft.Fast.Components.FluentUI.DataGrid.EntityFrameworkAdapter" Version="3.8.0" />
-    <PackageReference Include="Microsoft.Fast.Components.FluentUI.Icons" Version="3.8.0" />
-    <!--<PackageReference Include="Microsoft.FluentUI.AspNetCore.Components" Version="4.12.1" />
-    <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components.Icons" Version="4.12.1" />-->
+    <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components" Version="4.14.2" />
+    <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components.Icons" Version="4.14.2" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.0" />
     <PackageReference Include="NuGet.Packaging" Version="7.6.0" />
     <PackageReference Include="NuGet.Protocol" Version="7.6.0" />

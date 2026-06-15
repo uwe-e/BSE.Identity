@@ -2,23 +2,21 @@
 @attribute [Authorize(Roles = "Administrator")]
 
 @using BSE.Identity.Blazor.Client.ViewModels
-@using Microsoft.Fast.Components.FluentUI
+@using Microsoft.FluentUI.AspNetCore.Components
 @using Microsoft.AspNetCore.Identity
 
 @inject IStringLocalizer<Index> Localize
 @inject IStringLocalizer<ChangePasswordViewModel> LocalizerChangePassword
 
-<FluentDialogProvider />
-
 <PageTitle>@Localize["Txt_PageTitle"]</PageTitle>
 
 <FluentTabs Size="TabSize.Large">
-    <FluentTab Icon="@(new Icons.Regular.Size16.PeopleList())" Label="@Localize["Txt_TabTitle_UserManagement"]" Id="tab-1">
+    <FluentTab Icon="@(Icon.FromType<Icons.Regular.Size20.PeopleList>())" Label="@Localize["Txt_TabTitle_UserManagement"]" Id="tab-1">
         <Content>
             <BSE.Identity.Blazor.Client.Components.UserManagement/>
         </Content>
     </FluentTab>
-    <FluentTab Icon="@(new Icons.Regular.Size16.FolderPerson())" Label="@Localize["Txt_TabTitle_RoleManagement"]" Id="tab-2">
+    <FluentTab Icon="@(Icon.FromType<Icons.Regular.Size20.FolderPerson>())" Label="@Localize["Txt_TabTitle_RoleManagement"]" Id="tab-2">
         <Content>
             <BSE.Identity.Blazor.Client.Components.RoleManagement />
         </Content>

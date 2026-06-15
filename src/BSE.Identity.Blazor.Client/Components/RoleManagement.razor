@@ -1,6 +1,6 @@
 ﻿@using BSE.Identity.Blazor.Client.Services
 @using BSE.Identity.Blazor.Client.ViewModels;
-@using Microsoft.AspNetCore.Identity
+@using Microsoft.FluentUI.AspNetCore.Components
 
 @inject IRoleService RoleService
 @inject IStringLocalizer<RoleManagement> Localize
@@ -9,7 +9,7 @@
 <FluentToolbar Style="margin-top: 20px; width: 100%; border: 0px solid var(--accent-fill-rest)">
     <FluentLabel Typo="@Typography.Header">@Localize["Txt_GridHeader"]</FluentLabel>
     <FluentButton slot="end" Appearance="Appearance.Accent" OnClick="@OnCreateRole">
-        <FluentIcon Slot="start" Value="@(new Icons.Regular.Size16.FolderPerson())" Color="Color.Fill" />
+        <FluentIcon Slot="start" Value="@(Icon.FromType<Icons.Regular.Size20.FolderPerson>())" Color="Microsoft.FluentUI.AspNetCore.Components.Color.Fill" />
         @Localize["Btn_NewRole"]
     </FluentButton>
 </FluentToolbar>
@@ -17,12 +17,12 @@
 <ProgressOverlayPanel Style="height:500px; margin-top: 20px;" Visible="Roles is null">
 <FluentDataGrid Items="@Roles" Virtualize="true" ItemSize="40" role="grid" TGridItem="RoleViewModel">
     <PropertyColumn Property="@(u => u.Name)" Title="@Localize["Grid_Column_RoleName"]" Sortable="true" />
-    <TemplateColumn Title="Actions" Align="@Align.End">
+    <TemplateColumn Title="Actions" Align="Align.End">
         <FluentButton OnClick="@(() => OnEditRole(context))">
-            <FluentIcon Value="@(new Icons.Regular.Size16.Edit())" />
+            <FluentIcon Value="@(Icon.FromType<Icons.Regular.Size20.Edit>())" />
         </FluentButton>
         <FluentButton OnClick="@(() => OnDeleteRole(context))">
-                <FluentIcon Value="@(new Icons.Regular.Size16.Delete().WithColor("red"))" />
+                <FluentIcon Value="@(Icon.FromType<Icons.Regular.Size20.Delete>())" Color="@Microsoft.FluentUI.AspNetCore.Components.Color.Custom" CustomColor="red" />
         </FluentButton>
     </TemplateColumn>
 </FluentDataGrid>
