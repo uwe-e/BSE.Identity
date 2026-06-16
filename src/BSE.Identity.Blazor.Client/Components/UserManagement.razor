@@ -10,7 +10,7 @@
 <FluentToolbar Style="margin-top: 20px; width: 100%; border: 0px solid var(--accent-fill-rest)">
     <FluentLabel Typo="@Typography.Header">@Localize["Txt_GridHeader"]</FluentLabel>
     <FluentButton slot="end" Appearance="Appearance.Accent" OnClick="@OnCreateUser">
-        <FluentIcon Slot="start" Value="@(new Icons.Regular.Size16.PeopleAdd())" Color="Color.Fill" />
+        <FluentIcon Slot="start" Value="@(Icon.FromType<Icons.Regular.Size20.PeopleAdd>())" Color="Microsoft.FluentUI.AspNetCore.Components.Color.Fill" />
         @Localize["Btn_NewUser"]
     </FluentButton>
 </FluentToolbar>
@@ -22,15 +22,15 @@
         <PropertyColumn Property="@(u => u.FirstName)" Title="@Localize["Grid_Column_FirstName"]" Sortable="true" />
         <PropertyColumn Property="@(u => u.LastName)" Title="@Localize["Grid_Column_LastName"]" Sortable="true" />
         <PropertyColumn Property="@(u => string.Join(", ", u.Roles123.Select(r => r.Name)))" Title="@Localize["Grid_Column_Roles"]" Sortable="true" />
-        <TemplateColumn Title="@Localize["Grid_Column_Actions"]" Align="@Align.End">
+        <TemplateColumn Title="@Localize["Grid_Column_Actions"]" Align="Align.End">
             <FluentButton Title="@Localize["Grid_Column_Actions_EditUserData"]" OnClick="@(() => OnEditUser(context))">
-                <FluentIcon Value="@(new Icons.Regular.Size16.Edit())" />
+                <FluentIcon Value="@(Icon.FromType<Icons.Regular.Size20.Edit>())" />
             </FluentButton>
             <FluentButton Title="@Localize["Grid_Column_Actions_ChangePassword"]" OnClick="@(() => OnChangePassword(context))">
-                <FluentIcon Value="@(new Icons.Regular.Size16.Password())"  />
+                <FluentIcon Value="@(Icon.FromType<Icons.Regular.Size20.Password>())" />
             </FluentButton>
             <FluentButton Title="@Localize["Grid_Column_Actions_RemoveUser"]" OnClick="@(() => OnDeleteUser(context))">
-                <FluentIcon Value="@(new Icons.Regular.Size16.Delete().WithColor("red"))" />
+                <FluentIcon Value="@(Icon.FromType<Icons.Regular.Size20.Delete>())" Color="@Microsoft.FluentUI.AspNetCore.Components.Color.Custom" CustomColor="red" />
             </FluentButton>
         </TemplateColumn>
     </FluentDataGrid>

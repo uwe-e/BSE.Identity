@@ -7,7 +7,7 @@ using BSE.Identity.Blazor.Client.Services;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Fast.Components.FluentUI;
+using Microsoft.FluentUI.AspNetCore.Components;
 using MySqlConnector;
 using System.Security.Cryptography.X509Certificates;
 
@@ -15,7 +15,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 if (builder.Environment.IsProduction())
 {
-    using var x509Store = new X509Store(StoreLocation.CurrentUser);
+    using var x509Store = new X509Store(StoreLocation.LocalMachine);
     x509Store.Open(OpenFlags.ReadOnly);
     var x509Certificate = x509Store.Certificates
     .Find(
@@ -42,7 +42,7 @@ var connectionStringBuilder = new MySqlConnectionStringBuilder
 };
 
 builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
-    options.UseMySql(connectionStringBuilder.ConnectionString, new MySqlServerVersion(new Version(8, 0, 43)))
+    options.UseMySql(connectionStringBuilder.ConnectionString, ServerVersion.AutoDetect(connectionStringBuilder.ConnectionString))
     );
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddDefaultIdentity<ApplicationUser>(options =>

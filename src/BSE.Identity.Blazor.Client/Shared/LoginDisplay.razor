@@ -6,7 +6,7 @@
         <div slot="end">
             <FluentButton id="btnOpen1" Appearance="Appearance.Stealth" slot="end" @onclick="@(() => open = !open)">
                 @context.User.Identity?.Name
-                <FluentIcon Slot="end" Value="@(open ? ChevronUp : ChevronDown)" Color="Color.Neutral" />
+                <FluentIcon Slot="end" Value="@GetChevronIcon()" Color="Microsoft.FluentUI.AspNetCore.Components.Color.Neutral" />
             </FluentButton>
 
             <FluentMenu Anchor="btnOpen1" @bind-Open="open">
@@ -26,9 +26,9 @@
 
 @code {
     bool open = false;
-    Icon _chevronUp;
-    Icon _chevronDown;
 
-    Icon ChevronDown => _chevronDown ?? (_chevronDown = new Icons.Regular.Size16.ChevronDown());
-    Icon ChevronUp => _chevronUp ?? (_chevronUp = new Icons.Regular.Size16.ChevronUp());
+    private Icon GetChevronIcon()
+    {
+        return open ? Icon.FromType<Icons.Regular.Size20.ChevronUp>() : Icon.FromType<Icons.Regular.Size20.ChevronDown>();
+    }
 }

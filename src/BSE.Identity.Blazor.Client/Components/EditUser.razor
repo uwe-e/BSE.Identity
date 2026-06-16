@@ -1,8 +1,6 @@
-﻿@using BSE.Identity.Blazor.Client.Data
-@using BSE.Identity.Blazor.Client.Models
+﻿@using BSE.Identity.Blazor.Client.Models
 @using BSE.Identity.Blazor.Client.Services
 @using BSE.Identity.Blazor.Client.ViewModels
-@using Microsoft.AspNetCore.Identity
 
 @inherits EditFormDialogBase;
 
@@ -15,7 +13,7 @@
 <EditForm Model="@Content" OnValidSubmit="@HandleValidSubmit">
     <FluentDialogHeader ShowDismiss="true">
         <FluentStack VerticalAlignment="VerticalAlignment.Center">
-            <FluentIcon Value="@(new Icons.Regular.Size24.PeopleAdd())" />
+            <FluentIcon Value="@(Icon.FromType<Icons.Regular.Size24.PeopleAdd>())" />
             <FluentLabel Typo="Typography.PaneHeader">
                 @Localize["Txt_PageHeader"]
             </FluentLabel>
@@ -24,7 +22,7 @@
     </FluentDialogHeader>
 
     <FluentDialogBody>
-        <FluentStack Orientation="Orientation.Vertical">
+        <FluentStack Orientation="Microsoft.FluentUI.AspNetCore.Components.Orientation.Vertical">
 
             <DataAnnotationsValidator />
             <FluentValidationSummary />
@@ -36,7 +34,7 @@
 
             <FluentTextField @bind-Value=@Content.LastName TextFieldType="TextFieldType.Text" style="width: 100%;">@Localize["Label_LastName"]</FluentTextField>
 
-            <FluentStack Orientation="Orientation.Vertical">
+            <FluentStack Orientation="Microsoft.FluentUI.AspNetCore.Components.Orientation.Vertical">
                 <FluentLabel Typo="Typography.Body">Roles</FluentLabel>
                 @if (Roles != null)
                 {

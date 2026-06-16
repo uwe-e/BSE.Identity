@@ -1,7 +1,7 @@
 ﻿using BSE.Identity.Blazor.Client.Shared;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.Fast.Components.FluentUI;
+using Microsoft.FluentUI.AspNetCore.Components;
 
 namespace BSE.Identity.Blazor.Client.Components
 {

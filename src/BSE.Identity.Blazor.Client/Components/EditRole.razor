@@ -12,7 +12,7 @@
 <EditForm Model="@Content" OnValidSubmit="@HandleValidSubmit">
     <FluentDialogHeader ShowDismiss="true">
         <FluentStack VerticalAlignment="VerticalAlignment.Center">
-            <FluentIcon Value="@(new Icons.Regular.Size24.FolderPeople())" />
+            <FluentIcon Value="@(Icon.FromType<Icons.Regular.Size24.FolderPeople>())" />
             <FluentLabel Typo="Typography.PaneHeader">
                 @_pageHeader
             </FluentLabel>
@@ -21,7 +21,7 @@
     </FluentDialogHeader>
 
     <FluentDialogBody>
-        <FluentStack Orientation="Orientation.Vertical">
+        <FluentStack Orientation="Microsoft.FluentUI.AspNetCore.Components.Orientation.Vertical">
 
             <DataAnnotationsValidator />
             <FluentValidationSummary />
