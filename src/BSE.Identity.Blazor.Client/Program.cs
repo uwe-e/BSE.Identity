@@ -15,7 +15,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 if (builder.Environment.IsProduction())
 {
-    using var x509Store = new X509Store(StoreLocation.CurrentUser);
+    using var x509Store = new X509Store(StoreLocation.LocalMachine);
     x509Store.Open(OpenFlags.ReadOnly);
     var x509Certificate = x509Store.Certificates
     .Find(
