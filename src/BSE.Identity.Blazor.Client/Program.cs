@@ -35,10 +35,10 @@ if (builder.Environment.IsProduction())
 
 var connectionStringBuilder = new MySqlConnectionStringBuilder
 {
-    Server = builder.Configuration["mysql:server"],
-    Database = builder.Configuration["mysql:database"],
-    UserID = builder.Configuration["mysql:userid"],
-    Password = builder.Configuration["mysql:password"]
+    Server = builder.Configuration["identity:backend:server"],
+    Database = builder.Configuration["identity:backend:database"],
+    UserID = builder.Configuration["identity:backend:userid"],
+    Password = builder.Configuration["identity:backend:password"]
 };
 
 builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
@@ -88,8 +88,6 @@ else
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
-
-app.MigrateDatabase();
 
 app.UseHttpsRedirection();
 
