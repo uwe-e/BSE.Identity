@@ -34,6 +34,12 @@ namespace BSE.Identity.Blazor.Client.Data
             // Note: ConcurrencyStamp and SecurityStamp must be set to static values to prevent
             // EF Core migration errors. These properties default to Guid.NewGuid() which causes
             // the model to change on each build.
+
+            // administrator account for loggin in to a development environment.
+            // Please do not use this account in the production environment.
+            // Email address: admin@bsetunes.com
+            // Password: 123456_?
+
             var appUser = new ApplicationUser
             {
                 Id = ADMIN_ID,

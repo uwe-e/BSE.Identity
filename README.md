@@ -60,8 +60,16 @@ and run the dotnet command
 dotnet ef database update
 ```
 
-This adds the administrator account
+This creates the database and seeds the default values for an administrator account.
 
+The administration account for loggin in to a development environment is:
+
+```
+Email address: admin@bsetunes.com
+Password: 123456_?
+```
+
+Please do not use this account in the production environment.
 
 ## Restrictions
 

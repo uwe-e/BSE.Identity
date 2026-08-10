@@ -17,16 +17,22 @@ if (builder.Environment.IsProduction())
 {
     using var x509Store = new X509Store(StoreLocation.LocalMachine);
     x509Store.Open(OpenFlags.ReadOnly);
+
+    var thumbprint = builder.Configuration["KeyVault:AzureADCertThumbprint"];
+
     var x509Certificate = x509Store.Certificates
     .Find(
         X509FindType.FindByThumbprint,
-        builder.Configuration["KeyVault:AzureADCertThumbprint"],
+        thumbprint,
         validOnly: false)
     .OfType<X509Certificate2>()
     .Single();
 
+    var keyVaultName = builder.Configuration["KeyVault:Name"];
+    var keyVaultUri = new Uri($"https://{keyVaultName}.vault.azure.net/");
+
     builder.Configuration.AddAzureKeyVault(
-            new Uri($"https://{builder.Configuration["KeyVault:Name"]}.vault.azure.net/"),
+            keyVaultUri,
             new ClientCertificateCredential(
                 builder.Configuration["KeyVault:AzureADDirectoryId"],
                 builder.Configuration["KeyVault:AzureADApplicationId"],
@@ -38,7 +44,8 @@ var connectionStringBuilder = new MySqlConnectionStringBuilder
     Server = builder.Configuration["identity:backend:server"],
     Database = builder.Configuration["identity:backend:database"],
     UserID = builder.Configuration["identity:backend:userid"],
-    Password = builder.Configuration["identity:backend:password"]
+    Password = builder.Configuration["identity:backend:password"],
+    Port = uint.Parse(builder.Configuration["identity:backend:port"] ?? "3306"),
 };
 
 builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
