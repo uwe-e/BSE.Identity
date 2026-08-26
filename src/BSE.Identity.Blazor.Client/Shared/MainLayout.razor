@@ -1,4 +1,5 @@
-﻿@inherits LayoutComponentBase
+﻿@using System.Reflection
+@inherits LayoutComponentBase
 @inject IStringLocalizer<MainLayout> Localize
 
 <PageTitle>BSE.Identity.Blazor.Client</PageTitle>
@@ -15,6 +16,30 @@
 </main>
 <footer>
     <FluentStack Orientation="Microsoft.FluentUI.AspNetCore.Components.Orientation.Horizontal" style="justify-content:end">
+        <FluentLabel Typo="@Typography.Body">@string.Format(Localize["Txt_Footer-Version"], _appVersion)</FluentLabel>
         <FluentLabel Typo="@Typography.Body">@string.Format(Localize["Txt_Footer-Copyright"], DateTime.Now.Year)</FluentLabel>
     </FluentStack>
 </footer>
+
+@code {
+
+    private string? _appVersion;
+
+    protected override void OnInitialized()
+    {
+        var rawVersion = Assembly.GetExecutingAssembly()
+                                 .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
+                                 .InformationalVersion;
+
+        if (!string.IsNullOrEmpty(rawVersion))
+        {
+            // 2. Split by the '+' character and take only the first part
+            _appVersion = rawVersion.Split('+')[0];
+        }
+        else
+        {
+            // Fallback if informational version is missing
+            _appVersion = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "1.0.0";
+        }
+    }
+}

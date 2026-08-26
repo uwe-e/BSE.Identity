@@ -129,6 +129,9 @@
   <data name="Txt_Footer-Copyright" xml:space="preserve">
     <value>© {0} BSE, Uwe Eichkorn</value>
   </data>
+  <data name="Txt_Footer-Version" xml:space="preserve">
+    <value>Version {0}</value>
+  </data>
   <data name="Txt_FormHeader" xml:space="preserve">
     <value>Sign in</value>
   </data>

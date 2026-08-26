@@ -79,6 +79,8 @@ The [Data annotations localization](https://github.com/dotnet/aspnetcore/issues/
 
 ## Azure Keyvault
 
+The production environment uses configuration secrets stored in a keyvault on azure.
+
 [Azure Key Vault configuration provider in ASP.NET Core](https://learn.microsoft.com/en-us/aspnet/core/security/key-vault-configuration?view=aspnetcore-7.0#use-application-id-and-x509-certificate-for-non-azure-hosted-apps)
 
 ### New-SelfSignedCertificate
@@ -125,4 +127,8 @@ Open the management console mmc.exe, select the certificate snap-in for the loca
 
 ## Install the certificate on the local machine
 
-For connecting the IIS web to to use the Azure Keyvault For running on II
+needs to be described
+
+## Deployment
+
+The deployment is described in the  [deployment readme](./deployment/README.md).
