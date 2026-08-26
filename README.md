@@ -10,43 +10,66 @@ Blazor Server implementation with [Fluent UI Blazor components](https://www.flue
 
 you need a mysql server. Tested versions of the [community edition](https://dev.mysql.com/downloads/mysql/) are:
 - 5.7.33
-- 8.0.34
+- 8.0.46
 
 The used **Pomelo.EntityFrameworkCore.MySql** database provider needs the used database version.
 
 ```
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseMySql(connectionStringBuilder.ConnectionString, new MySqlServerVersion(new Version(8, 0, 34)))
-);
+ builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
+     options.UseMySql(
+        connectionStringBuilder.ConnectionString,
+        ServerVersion.AutoDetect(connectionStringBuilder.ConnectionString))
+     );
 ```
 
-### Necessary user privileges
+### Necessary user privileges for development
 
-For database creation, we need the following provileges
+For database creation, we need a database user with root privileges.
 
-- DBManager
-- DBDesigner
+### Git checkout
 
-and the custom privilege
+Clone the git repository into your desired root directory using the following command:
 
-- REFERENCES
-
-![MySQL Privileges](/docs/images/MySQL-UserPrivileges.png)
-
-### Database creation
-
-If the database is not available, it will be created on first startup
+```
+git clone https://github.com/uwe-e/BSE.Identity.git
+```
 
 ### User Secrets
 
-open a console navigate into the project directory and type 
+open a console, navigate into the project directory and type 
 
 ```
-dotnet user-secrets set mysql:server "yourdatabaseserver"
-dotnet user-secrets set mysql:database "yourdatabase"
-dotnet user-secrets set mysql:userid "userid"
-dotnet user-secrets set mysql:password "password"
+dotnet user-secrets set identity:backend:server "localhost"
+dotnet user-secrets set identity:backend:port "3306"
+dotnet user-secrets set identity:backend:database "Identity"
+dotnet user-secrets set identity:backend:userid "myrootuserid"
+dotnet user-secrets set identity:backend:password "mypassword"
 ```
+
+### Database creation
+
+Open a PowerShell console and navigate to the project directory...
+
+```
+cd C:\Git\Blazor\BSE.Identity\src\BSE.Identity.Blazor.Client
+```
+
+and run the dotnet command
+
+```
+dotnet ef database update
+```
+
+This creates the database and seeds the default values for an administrator account.
+
+The administration account for loggin in to a development environment is:
+
+```
+Email address: admin@bsetunes.com
+Password: 123456_?
+```
+
+Please do not use this account in the production environment.
 
 ## Restrictions
 
@@ -55,6 +78,8 @@ The [Data annotations localization](https://github.com/dotnet/aspnetcore/issues/
 
 
 ## Azure Keyvault
+
+The production environment uses configuration secrets stored in a keyvault on azure.
 
 [Azure Key Vault configuration provider in ASP.NET Core](https://learn.microsoft.com/en-us/aspnet/core/security/key-vault-configuration?view=aspnetcore-7.0#use-application-id-and-x509-certificate-for-non-azure-hosted-apps)
 
@@ -99,3 +124,11 @@ Open the management console mmc.exe, select the certificate snap-in for the loca
 ![Azure Keyvault Access Policy](/docs/images/azure-keyvault-configure-access-policy.png)
 
 ![Azure Keyvault Access Principal](/docs/images/azure-keyvault-configure-access-policy-principal.png)
+
+## Install the certificate on the local machine
+
+needs to be described
+
+## Deployment
+
+The deployment is described in the  [deployment readme](./deployment/README.md).

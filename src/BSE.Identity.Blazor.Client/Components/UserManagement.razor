@@ -1,0 +1,111 @@
+﻿@using BSE.Identity.Blazor.Client.Services
+@using BSE.Identity.Blazor.Client.ViewModels
+@using BSE.Identity.Blazor.Client.Models
+
+@inject IStringLocalizer<UserManagement> Localize
+@inject IStringLocalizer<ChangePasswordViewModel> LocalizerChangePassword
+@inject IUserService UserService;
+@inject IDialogService DialogService
+
+<FluentToolbar Style="margin-top: 20px; width: 100%; border: 0px solid var(--accent-fill-rest)">
+    <FluentLabel Typo="@Typography.Header">@Localize["Txt_GridHeader"]</FluentLabel>
+    <FluentButton slot="end" Appearance="Appearance.Accent" OnClick="@OnCreateUser">
+        <FluentIcon Slot="start" Value="@(Icon.FromType<Icons.Regular.Size20.PeopleAdd>())" Color="Microsoft.FluentUI.AspNetCore.Components.Color.Fill" />
+        @Localize["Btn_NewUser"]
+    </FluentButton>
+</FluentToolbar>
+
+<ProgressOverlayPanel Style="height:500px; margin-top: 20px;" Visible="Users is null">
+
+    <FluentDataGrid id="manualGrid" Items="@Users" Virtualize="true" ItemSize="40" role="grid" TGridItem="UserRolesViewModel" GenerateHeader="GenerateHeaderOption.Sticky">
+        <PropertyColumn Property="@(u => u.UserName)" Title="@Localize["Grid_Column_UserName"]" Sortable="true" />
+        <PropertyColumn Property="@(u => u.FirstName)" Title="@Localize["Grid_Column_FirstName"]" Sortable="true" />
+        <PropertyColumn Property="@(u => u.LastName)" Title="@Localize["Grid_Column_LastName"]" Sortable="true" />
+        <PropertyColumn Property="@(u => string.Join(", ", u.Roles123.Select(r => r.Name)))" Title="@Localize["Grid_Column_Roles"]" Sortable="true" />
+        <TemplateColumn Title="@Localize["Grid_Column_Actions"]" Align="Align.End">
+            <FluentButton Title="@Localize["Grid_Column_Actions_EditUserData"]" OnClick="@(() => OnEditUser(context))">
+                <FluentIcon Value="@(Icon.FromType<Icons.Regular.Size20.Edit>())" />
+            </FluentButton>
+            <FluentButton Title="@Localize["Grid_Column_Actions_ChangePassword"]" OnClick="@(() => OnChangePassword(context))">
+                <FluentIcon Value="@(Icon.FromType<Icons.Regular.Size20.Password>())" />
+            </FluentButton>
+            <FluentButton Title="@Localize["Grid_Column_Actions_RemoveUser"]" OnClick="@(() => OnDeleteUser(context))">
+                <FluentIcon Value="@(Icon.FromType<Icons.Regular.Size20.Delete>())" Color="@Microsoft.FluentUI.AspNetCore.Components.Color.Custom" CustomColor="red" />
+            </FluentButton>
+        </TemplateColumn>
+    </FluentDataGrid>
+
+</ProgressOverlayPanel>
+
+@code {
+
+    IQueryable<UserRolesViewModel>? Users;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Users is null){
+            Users = await UserService.GetAllUsersWithRolesAsync();
+        }
+        await base.OnInitializedAsync();
+    }
+
+    async Task OnCreateUser()
+    {
+        await DialogService.ShowDialogAsync<CreateUser>(new DialogParameters()
+        {
+            OnDialogResult = DialogService.CreateDialogCallback(this, OnUserDataChanged),
+            Modal = true,
+            PreventDismissOnOverlayClick = true,
+        });
+    }
+
+    async Task OnEditUser(UserRolesViewModel model)
+    {
+        await DialogService.ShowPanelAsync<EditUser>(model, new DialogParameters()
+        {
+            OnDialogResult = DialogService.CreateDialogCallback(this, OnUserDataChanged),
+            Modal = true,
+            PreventDismissOnOverlayClick = true
+        });
+    }
+
+    async Task OnChangePassword(UserRolesViewModel model)
+    {
+        await DialogService.ShowPanelAsync<ChangeUserPassword>(new ChangePasswordViewModel(LocalizerChangePassword)
+            {
+                UserId = model.UserId,
+                UserName = model.UserName,
+                Email = model.Email
+            }, new DialogParameters()
+        {
+                Modal = true,
+                PreventDismissOnOverlayClick = true
+        });
+    }
+
+    async Task OnUserDataChanged(DialogResult result)
+    {
+        // Only reload users if not cancelled
+        Users = await UserService.GetAllUsersWithRolesAsync();
+    }
+
+    async Task OnDeleteUser(UserRolesViewModel model)
+    {
+        string dialogResultYes = Localize.GetString("Dlg_Result_Yes");
+        string dialogResultNo = Localize.GetString("Dlg_Result_No");
+        string dialogTitle = Localize.GetString("Dlg_UserDeletion_Title");
+        string dialogMessage = Localize.GetString("Dlg_UserDeletion_Message", model.UserName);
+
+        var dialog = await DialogService.ShowConfirmationAsync(dialogMessage, dialogResultYes, dialogResultNo, dialogTitle);
+        var result = await dialog.Result;
+        if (!result.Cancelled)
+        {
+            if (await UserService.DeleteUserAsync(model.UserId))
+            {
+                Users = null;
+                Users = await UserService.GetAllUsersWithRolesAsync();
+            }
+        }
+    }
+
+}

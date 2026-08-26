@@ -1,0 +1,86 @@
+﻿@using BSE.Identity.Blazor.Client.Models
+@using BSE.Identity.Blazor.Client.Services
+@using BSE.Identity.Blazor.Client.ViewModels
+
+@inherits EditFormDialogBase;
+
+@implements IDialogContentComponent<UserRolesViewModel>
+
+@inject IUserService UserService;
+@inject IRoleService RoleService;
+@inject IStringLocalizer<EditUser> Localize
+
+<EditForm Model="@Content" OnValidSubmit="@HandleValidSubmit">
+    <FluentDialogHeader ShowDismiss="true">
+        <FluentStack VerticalAlignment="VerticalAlignment.Center">
+            <FluentIcon Value="@(Icon.FromType<Icons.Regular.Size24.PeopleAdd>())" />
+            <FluentLabel Typo="Typography.PaneHeader">
+                @Localize["Txt_PageHeader"]
+            </FluentLabel>
+        </FluentStack>
+
+    </FluentDialogHeader>
+
+    <FluentDialogBody>
+        <FluentStack Orientation="Microsoft.FluentUI.AspNetCore.Components.Orientation.Vertical">
+
+            <DataAnnotationsValidator />
+            <FluentValidationSummary />
+            <ErrorMessenger @ref="ErrorMessenger" />
+
+            <FluentTextField @bind-Value=@Content.Email TextFieldType="TextFieldType.Email" Disabled="true" style="width: 100%;">@Localize["Label_EmailAddress"]</FluentTextField>
+
+            <FluentTextField @bind-Value=@Content.FirstName TextFieldType="TextFieldType.Text" Disabled="false" style="width: 100%;">@Localize["Label_FirstName"]</FluentTextField>
+
+            <FluentTextField @bind-Value=@Content.LastName TextFieldType="TextFieldType.Text" style="width: 100%;">@Localize["Label_LastName"]</FluentTextField>
+
+            <FluentStack Orientation="Microsoft.FluentUI.AspNetCore.Components.Orientation.Vertical">
+                <FluentLabel Typo="Typography.Body">Roles</FluentLabel>
+                @if (Roles != null)
+                {
+                    foreach (var role in Roles)
+                    {
+                        <FluentCheckbox @bind-Value=role.IsSelected>@role.Name</FluentCheckbox>
+                    }
+                }
+            </FluentStack>
+
+        </FluentStack>
+    </FluentDialogBody>
+    <FluentDialogFooter>
+        <FluentButton Type="ButtonType.Submit" Appearance="Appearance.Accent">@Localize["Btn_Submit"]</FluentButton>
+        <FluentButton OnClick="@OnCancel">Cancel</FluentButton>
+    </FluentDialogFooter>
+
+</EditForm>
+@code {
+
+    [Parameter]
+    public UserRolesViewModel Content { get; set; } = new UserRolesViewModel();
+
+    IList<RoleViewModel>? Roles;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Roles = await RoleService.GetRolesByUserAsync(Content.UserId);
+        await base.OnInitializedAsync();
+    }
+
+    protected override async Task HandleValidSubmit(EditContext editContext)
+    {
+        ErrorMessenger?.Errors.Clear();
+
+        var identityResult = await UserService.UpdateUserRolesAsync(Content, Roles ?? new List<RoleViewModel>());
+        if (!identityResult.Succeeded)
+        {
+            ErrorMessenger?.Errors.Add("Before we can add the selected roles, we remove the existing roles. That fails");
+            ErrorMessenger?.ShowErrors();
+            return;
+        }
+
+        if (Dialog is not null)
+        {
+            await Dialog.CloseAsync();
+        }
+    }
+}

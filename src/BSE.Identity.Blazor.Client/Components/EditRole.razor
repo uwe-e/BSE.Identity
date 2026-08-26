@@ -1,17 +1,18 @@
-﻿@using BSE.Identity.Blazor.Client.ViewModels;
-@using Microsoft.AspNetCore.Identity;
+﻿@using BSE.Identity.Blazor.Client.Services
+@using BSE.Identity.Blazor.Client.ViewModels;
+@using Microsoft.AspNetCore.Identity
 
 @inherits EditFormDialogBase;
 
 @implements IDialogContentComponent<RoleViewModel>
 
-@inject RoleManager<IdentityRole> RoleManager
+@inject IRoleService RoleService;
 @inject IStringLocalizer<EditRole> Localize
 
 <EditForm Model="@Content" OnValidSubmit="@HandleValidSubmit">
     <FluentDialogHeader ShowDismiss="true">
         <FluentStack VerticalAlignment="VerticalAlignment.Center">
-            <FluentIcon Value="@(new Icons.Regular.Size24.FolderPeople())" />
+            <FluentIcon Value="@(Icon.FromType<Icons.Regular.Size24.FolderPeople>())" />
             <FluentLabel Typo="Typography.PaneHeader">
                 @_pageHeader
             </FluentLabel>
@@ -20,7 +21,7 @@
     </FluentDialogHeader>
 
     <FluentDialogBody>
-        <FluentStack Orientation="Orientation.Vertical">
+        <FluentStack Orientation="Microsoft.FluentUI.AspNetCore.Components.Orientation.Vertical">
 
             <DataAnnotationsValidator />
             <FluentValidationSummary />
@@ -53,46 +54,43 @@
     {
         ErrorMessenger?.Errors.Clear();
 
-        IdentityResult identityResult = null;
-        /*
-        * If there's a roleId, the content was created outside of the dialog.
-        * In this case we update an existing role, otherwise we create a new role.
-        */
-        if (Guid.TryParse(Content?.Id, out Guid roleId))
-        {
-            IdentityRole identityRole = await RoleManager.FindByIdAsync(roleId.ToString());
-            if (identityRole is not null)
-            {
-                identityRole.Name = Content.Name;
-                identityResult = await RoleManager.UpdateAsync(identityRole);
-            }
+        IdentityResult? identityResult = null;
 
+        // Prefer null/empty check for Id, and avoid unnecessary nullable checks
+        var roleId = Content?.Id;
+        var roleName = Content?.Name;
+
+        if (!string.IsNullOrWhiteSpace(roleId))
+        {
+            identityResult = await RoleService.UpdateRoleAsync(Content);
+        }
+        else if (!string.IsNullOrWhiteSpace(roleName))
+        {
+            identityResult = await RoleService.CreateRoleAsync(roleName);
         }
         else
         {
-            IdentityRole identityRole = new IdentityRole
-                {
-                    Name = Content?.Name
-                };
-            identityResult = await RoleManager.CreateAsync(identityRole);
-        }
-
-        if (identityResult != null && !identityResult.Succeeded)
-        {
-            foreach (var identityError in identityResult.Errors)
-            {
-                ErrorMessenger?.Errors.Add(identityError.Description);
-            }
-
+            ErrorMessenger?.Errors.Add("Role name is required.");
             ErrorMessenger?.ShowErrors();
-
+            return;
         }
-        else
+
+        if (identityResult is null || !identityResult.Succeeded)
         {
-            if (Dialog is not null)
+            if (identityResult?.Errors is not null)
             {
-                await Dialog.CloseAsync();
+                foreach (var identityError in identityResult.Errors)
+                {
+                    ErrorMessenger?.Errors.Add(identityError.Description);
+                }
             }
+            ErrorMessenger?.ShowErrors();
+            return;
+        }
+
+        if (Dialog is not null)
+        {
+            await Dialog.CloseAsync();
         }
     }
 }
