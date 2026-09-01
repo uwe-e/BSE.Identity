@@ -131,4 +131,15 @@ needs to be described
 
 ## Deployment
 
-The deployment is described in the  [deployment readme](./deployment/README.md).
+For deployment
+- open a powershell console,
+- navigate to the **deployment** folder of the project
+
+ and execute the following script:
+
+```powershell
+# Production (user from the KeyVault)
+.\Deploy.ps1 -Environment production -UseKeyVault
+```
+
+The deployment options are described in this [readme](./deployment/README.md).
