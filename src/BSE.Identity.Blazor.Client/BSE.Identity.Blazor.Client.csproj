@@ -10,7 +10,7 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/uwe-e/BSE.Identity</RepositoryUrl>
     <PackageProjectUrl>https://github.com/uwe-e/BSE.Identity</PackageProjectUrl>
-    <Version>1.0.0-beta</Version>
+    <Version>1.0.1-beta</Version>
   </PropertyGroup>
 
   <ItemGroup>
